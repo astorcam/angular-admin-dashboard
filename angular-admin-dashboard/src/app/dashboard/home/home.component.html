@@ -1,1 +1,25 @@
-<p>home works!</p>
+<mat-sidenav-container class="dashboard-container">
+
+  <!-- Sidebar -->
+  <mat-sidenav mode="side" opened>
+    <app-user-menu></app-user-menu>
+  </mat-sidenav>
+
+  <!-- Contenido principal -->
+  <mat-sidenav-content>
+    <!-- Navbar superior -->
+    <app-general-menu></app-general-menu>
+
+    <!-- Contenido dinámico -->
+    <main class="dashboard-content">
+        <h1>MAIN STATS</h1>
+        <div class="fast-stats">
+           <app-stats-card statsTitle="Total Sales" statsIcon="sell" [statsValue]=3000></app-stats-card>
+           <app-stats-card statsTitle="Profit" statsIcon="attach_money" [statsValue]=3000></app-stats-card>
+           <app-stats-card statsTitle="Total Users" statsIcon="group" [statsValue]=totalUsers></app-stats-card>
+           <app-stats-card statsTitle="Total Products" statsIcon="inventory_2" [statsValue]=totalProducts></app-stats-card>
+        </div>            
+    </main>
+  </mat-sidenav-content>
+
+</mat-sidenav-container>

@@ -1,0 +1,19 @@
+$sidenav-color:#173753;
+
+
+.mat-sidenav-container{
+    background-color: $sidenav-color;
+    height: 100%!important;
+}
+
+#stockdash_logo {
+  max-height: 13rem;
+  width: auto;
+}
+
+span{
+    color: white;
+}
+mat-icon{
+    color: white;
+}

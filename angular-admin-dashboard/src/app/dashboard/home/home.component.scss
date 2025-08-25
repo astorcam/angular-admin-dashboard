@@ -1,0 +1,23 @@
+$dashboard-bg:#f2f3f4;
+
+.dashboard-container {
+  height: 100vh;
+  background-color: $dashboard-bg;
+}
+
+.dashboard-content {
+  padding: 1rem;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+app-stats-card{
+    padding-top: 1rem;
+    padding-right: 2rem;
+} 
+.fast-stats{
+    flex: 1 1 100%;
+    text-align: center;
+}
