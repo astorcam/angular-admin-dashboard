@@ -14,11 +14,14 @@
     <main class="dashboard-content">
         <h1>MAIN STATS</h1>
         <div class="fast-stats">
-           <app-stats-card statsTitle="Total Sales" statsIcon="sell" [statsValue]=3000></app-stats-card>
-           <app-stats-card statsTitle="Profit" statsIcon="attach_money" [statsValue]=3000></app-stats-card>
+           <app-stats-card statsTitle="Total Sales" statsIcon="sell" [statsValue]=totalSales></app-stats-card>
+           <app-stats-card statsTitle="Profit" statsIcon="attach_money" [statsValue]=profit></app-stats-card>
            <app-stats-card statsTitle="Total Users" statsIcon="group" [statsValue]=totalUsers></app-stats-card>
            <app-stats-card statsTitle="Total Products" statsIcon="inventory_2" [statsValue]=totalProducts></app-stats-card>
-        </div>            
+        </div>  
+        <h1>CHARTS</h1>
+        <app-bar-chart [chart]="barChart"></app-bar-chart>   
+        <app-line-chart [chart]="lineChart"></app-line-chart>     
     </main>
   </mat-sidenav-content>
 
