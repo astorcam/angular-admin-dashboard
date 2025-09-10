@@ -10,11 +10,12 @@ import { SaleService } from '../../services/sale.service';
 import { BarChartComponent } from '../layout/bar-chart/bar-chart.component';
 import { Chart } from 'chart.js';
 import { LineChartComponent } from "../layout/line-chart/line-chart.component";
+import { DataTableComponent } from "../layout/data-table/data-table.component";
 
 
 @Component({
   selector: 'app-home',
-  imports: [RouterModule, UserMenuComponent, GeneralMenuComponent, StatsCardComponent, BarChartComponent, MatSidenavModule, LineChartComponent],
+  imports: [RouterModule, UserMenuComponent, GeneralMenuComponent, StatsCardComponent, BarChartComponent, MatSidenavModule, LineChartComponent, DataTableComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
@@ -52,11 +53,16 @@ export class HomeComponent {
     label: 'Anual Profits',
     data: [],
     fill: false,
-    borderColor: '#EEC584',
+    borderColor: '#5FAD56',
     tension: 0.1
   }]
 }
 };
+userTableConfig:any={
+  columns:[],
+  displayedColumns:[{}],
+  dataSource:[{}]
+}
 
   constructor(private userService: UserService,
      private productService: ProductService,
@@ -64,7 +70,17 @@ export class HomeComponent {
   ){};
  
 ngOnInit(){
-  this.userService.getUsers().subscribe(u => this.totalUsers = u.length);
+  this.userService.getUsers().subscribe(u => {
+    this.totalUsers = u.length
+    const keys = Object.keys(u[0]);
+    this.userTableConfig.columns=keys;
+    this.userTableConfig.displayedColumns = keys.map(k => ({
+    key: k,
+    label: k.charAt(0).toUpperCase() + k.slice(1)
+  }));
+    this.userTableConfig.dataSource=u;
+
+});
   this.productService.getProducts().subscribe(p => this.totalProducts = p.length);
   this.saleService.getSales().subscribe(s => this.totalSales = s.length);
   this.saleService.getAnualSales().subscribe(monthlySales => {

@@ -4,16 +4,26 @@ $sidenav-color:#173753;
 .mat-sidenav-container{
     background-color: $sidenav-color;
     height: 100%!important;
+
 }
+
+
 
 #stockdash_logo {
   max-height: 13rem;
   width: auto;
+  display: block;
+  margin: 0 auto; // centrado del logo
+}
+mat-nav-list a[mat-list-item] span{
+    color: white;
+    padding-left:0.5rem ;
 }
 
-span{
-    color: white;
-}
 mat-icon{
     color: white;
+    flex-shrink: 0;
+    padding-bottom: 0.4rem;
+    height: auto;
+    vertical-align: middle;
 }

@@ -1,0 +1,22 @@
+table {
+  width: 100%;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
+/* Fila completa */
+tr[data-role="Admin"] {
+  background-color: rgba(0, 200, 83, 0.2); /* verde suave */
+  color: #2e7d32; /* verde oscuro */
+  font-weight: bold;
+}
+
+tr[data-role="User"] {
+  background-color: rgba(255, 235, 59, 0.2); /* amarillo suave */
+  color: #f9a825; /* amarillo oscuro */
+  font-weight: bold;
+}
+
+tr[data-role="Manager"] {
+  background-color: rgba(33, 150, 243, 0.2); /* azul suave */
+  color: #1565c0; /* azul más oscuro */
+  font-weight: bold;
+}
