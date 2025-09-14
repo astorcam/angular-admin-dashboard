@@ -15,6 +15,7 @@ import {MatButtonModule} from '@angular/material/button';
 export class StatsCardComponent {
 @Input({required:true}) statsTitle!: string;
 @Input({required:true}) statsIcon!: string;
+@Input({required:true}) statsText!: string;
 @Input({required:true}) statsValue!: number;
 
 }

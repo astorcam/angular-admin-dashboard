@@ -1,1 +1,13 @@
-<p>product-list works!</p>
+<div class="dashboard-content">
+    <h1>Products</h1>
+        <div class="fast-stats">
+           <app-stats-card statsTitle="Best Seller" statsIcon="sell" [statsText]="bestSeller.name" [statsValue]="bestSeller.sales"></app-stats-card>
+           <app-stats-card statsTitle="Worst Seller" statsIcon="sell" [statsText]="worstSeller.name" [statsValue]="worstSeller.sales"></app-stats-card>
+        </div> 
+    
+    <app-data-table 
+        [columns]="productTableConfig.columns"
+        [displayedColumns]="productTableConfig.displayedColumns"
+        [dataSource]="productTableConfig.dataSource">
+    </app-data-table>
+</div>

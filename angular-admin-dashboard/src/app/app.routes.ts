@@ -8,7 +8,7 @@ import { DashboardLayoutComponent } from './layout/dashboard-layout/dashboard-la
 export const routes: Routes = [
    {
     path: '',
-    component: HomeComponent,
+    component: DashboardLayoutComponent,
     children: [
       { path: 'dashboard', component: HomeComponent },
       { path: 'products', component: ProductListComponent },

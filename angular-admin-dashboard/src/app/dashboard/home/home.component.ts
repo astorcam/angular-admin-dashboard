@@ -15,7 +15,7 @@ import { DataTableComponent } from "../layout/data-table/data-table.component";
 
 @Component({
   selector: 'app-home',
-  imports: [RouterModule, UserMenuComponent, GeneralMenuComponent, StatsCardComponent, BarChartComponent, MatSidenavModule, LineChartComponent, DataTableComponent],
+  imports: [RouterModule, StatsCardComponent, BarChartComponent, MatSidenavModule, LineChartComponent, DataTableComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
