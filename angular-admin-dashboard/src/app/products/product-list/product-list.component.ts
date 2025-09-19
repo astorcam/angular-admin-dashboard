@@ -3,6 +3,7 @@ import { DataTableComponent } from '../../dashboard/layout/data-table/data-table
 import { ProductService } from '../../services/product.service';
 import { StatsCardComponent } from '../../dashboard/layout/stats-card/stats-card.component';
 import { SaleService } from '../../services/sale.service';
+import { forkJoin, map } from 'rxjs';
 
 @Component({
   selector: 'app-product-list',
@@ -45,35 +46,38 @@ ngOnInit(){
   //most sales category
   this.salesService.getSales().subscribe(s=>{
     const completed = s.filter(s => s.status === 'Completed');
-    const salesCategories: { [key: string]: number } = {}; 
     const productSales: { [key: number]: number } = {}; 
     completed.forEach(sale => {
-        if (!productSales[sale.productId]) {
-          productSales[sale.productId] = 0;
-        }
-        productSales[sale.productId] += sale.quantity;
-    })
-    for (const key in productSales) {
-      this.productService.getProductById(Number(key)).subscribe(p =>{
-         p.category
-        if (!salesCategories[p.category]) {
-            salesCategories[p.category] = 0;
-          }
-        salesCategories[p.category]+=productSales[key]
-      })
-    }
-    let mostSalesCategory="";
-    let maxQty = 0;
-      
-      for (const category in salesCategories) {
-        if (salesCategories[category] > maxQty) {
-          maxQty= salesCategories[category]
-          mostSalesCategory=category
-        }
+      if (!productSales[sale.productId]) {
+        productSales[sale.productId] = 0;
       }
-      this.mostSalesCategory.category = mostSalesCategory;
-      this.mostSalesCategory.sales = maxQty;
-  })
+      productSales[sale.productId] += sale.quantity;
+    })
+
+    const requests = Object.keys(productSales).map(id =>
+    this.productService.getProductById(Number(id)).pipe(
+      map(product => ({ category: product.category, qty: productSales[Number(id)] }))
+    )
+  );
+
+   forkJoin(requests).subscribe(results => {
+     const salesCategories: { [key: string]: number } = {}; 
+     results.forEach(r => {
+      salesCategories[r.category] = (salesCategories[r.category] || 0) + r.qty;
+    });
+     let mostSalesCategory="";
+     let maxQty = 0;
+       
+       for (const category in salesCategories) {
+         if (salesCategories[category] > maxQty) {
+           maxQty= salesCategories[category]
+           mostSalesCategory=category
+         }
+       }
+       this.mostSalesCategory.category = mostSalesCategory;
+       this.mostSalesCategory.sales = maxQty;
+   })
+   })
 
 
   this.productService.getProducts().subscribe(p =>{
