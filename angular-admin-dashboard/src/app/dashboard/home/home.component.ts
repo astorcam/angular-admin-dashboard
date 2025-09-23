@@ -13,6 +13,7 @@ import { LineChartComponent } from "../layout/line-chart/line-chart.component";
 import { DataTableComponent } from "../layout/data-table/data-table.component";
 
 
+const months=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 @Component({
   selector: 'app-home',
   imports: [RouterModule, StatsCardComponent, BarChartComponent, MatSidenavModule, LineChartComponent, DataTableComponent],
@@ -26,16 +27,15 @@ export class HomeComponent {
   profit=0;
   barChart!: Chart;
   lineChart!: Chart;
-  months=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   barConfig: any = {
     type: 'bar',
     data: {
-       labels: this.months,
+       labels: months,
        datasets: [
       { 
         label: 'Sales 2025',
         data: [],
-        backgroundColor: '#EEC584',
+        backgroundColor: '#FFC154',
         borderColor: '#0e1f2eff',
         borderWidth: 1
       }
@@ -48,12 +48,12 @@ export class HomeComponent {
   lineConfig: any = {
   type: 'line',
   data: {
-  labels: this.months,
+  labels: months,
   datasets: [{
     label: 'Anual Profits',
     data: [],
     fill: false,
-    borderColor: '#5FAD56',
+    borderColor: '#47B39C',
     tension: 0.1
   }]
 }

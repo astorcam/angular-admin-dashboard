@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { Chart} from 'chart.js';
+
 
 @Component({
   selector: 'app-pie-chart',
@@ -7,5 +9,6 @@ import { Component } from '@angular/core';
   styleUrl: './pie-chart.component.scss'
 })
 export class PieChartComponent {
+ @Input({required:true}) chart!: Chart;
 
 }
