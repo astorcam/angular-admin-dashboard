@@ -1,18 +1,32 @@
-<table mat-table 
-       [dataSource]="dataSource" 
-       cdkDropList 
-       cdkDropListOrientation="horizontal" 
-       (cdkDropListDropped)="drop($event)">
+<mat-form-field>
+  <mat-label>Filter</mat-label>
+  <input matInput (keyup)="applyFilter($event)" placeholder="" #input>
+</mat-form-field>
 
-  <ng-container *ngFor="let col of columns" [matColumnDef]="col">
-    <th mat-header-cell *matHeaderCellDef cdkDrag>
-    {{ labelMap[col] || col }}
-    </th>
-    <td mat-cell *matCellDef="let element">
-      {{ element[col] }}
-    </td>
-  </ng-container>
+<div class="mat-elevation-z8">
+  <table mat-table [dataSource]="tableDataSource" matSort>
 
-  <tr mat-header-row *matHeaderRowDef="columns"></tr>
-  <tr mat-row *matRowDef="let row; columns: columns;"  [attr.data-role]="row.role"></tr>
-</table>
+    <ng-container *ngFor="let col of columns" [matColumnDef]="col">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>
+        {{ labelMap[col] || col }}
+      </th>
+      <td mat-cell *matCellDef="let element">
+        {{ element[col] }}
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="columns"></tr>
+    <tr mat-row *matRowDef="let row; columns: columns;"></tr>
+
+    <tr class="mat-row" *matNoDataRow>
+      <td class="mat-cell" [attr.colspan]="columns.length">
+        No data matching the filter "{{ input.value }}"
+      </td>
+    </tr>
+  </table>
+
+  <mat-paginator
+    [pageSizeOptions]="[5, 10, 25, 100]"
+    aria-label="Select page of users">
+  </mat-paginator>
+</div>

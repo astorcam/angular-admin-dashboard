@@ -1,22 +1,38 @@
-import { Component, Input  } from '@angular/core';
+import { Component, Input, ViewChild  } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import {CdkDragDrop, CdkDrag, CdkDropList, moveItemInArray} from '@angular/cdk/drag-drop';
-import {MatTableModule} from '@angular/material/table';
+import {MatTableDataSource, MatTableModule} from '@angular/material/table';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import {MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
+import {MatSort, MatSortModule} from '@angular/material/sort';
+
+
 
 @Component({
   selector: 'app-data-table',
-  imports: [MatTableModule, CdkDropList, CdkDrag, CommonModule],
+  imports: [MatTableModule , CommonModule, MatFormFieldModule, MatInputModule, MatTableModule, MatSortModule, MatPaginatorModule],
   templateUrl: './data-table.component.html',
   styleUrl: './data-table.component.scss'
 })
 
 export class DataTableComponent {
   @Input() columns: string[] = []; 
-  @Input() dataSource: any[] = [];
   @Input() displayedColumns: { key: string, label: string }[] = [];
+  @Input() set dataSource(data: any[]) {
+    this.tableDataSource.data = data; 
+  }
 
-labelMap: Record<string, string> = {};
+  tableDataSource = new MatTableDataSource<any>([]);
+
+  labelMap: Record<string, string> = {};
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
+
+ constructor() {
+    // Assign the data to the data source for the table to render
+    this.tableDataSource = new MatTableDataSource(this.dataSource);
+  }
 
 ngOnChanges() {
   this.labelMap = this.displayedColumns.reduce((acc, col) => {
@@ -25,8 +41,18 @@ ngOnChanges() {
   }, {} as Record<string, string>);
 }   
 
-drop(event: CdkDragDrop<string[]>) {
-    moveItemInArray(this.columns, event.previousIndex, event.currentIndex);
+ngAfterViewInit() {
+    this.tableDataSource.paginator = this.paginator;
+    this.tableDataSource.sort = this.sort;
+  }
+
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.tableDataSource.filter = filterValue.trim().toLowerCase();
+
+    if (this.tableDataSource.paginator) {
+      this.tableDataSource.paginator.firstPage();
+    }
   }
 }
 
