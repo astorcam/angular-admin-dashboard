@@ -70,7 +70,7 @@ getBestSeller() {
   }
   getWorstSeller() {
     return this.http.get<any[]>(this.apiUrl).pipe(
-    map(sales=>{
+      map(sales=>{
       const completed = sales.filter(s => s.status === 'Completed');
       const hashTotals: { [key: number]: number } = {}; 
       completed.forEach(sale => {
@@ -90,6 +90,24 @@ getBestSeller() {
       }
       return { productId: worstSellerId, totalSold: maxQty };
     }))
+  }
+  getAnualSalesPerProduct() {
+    return this.http.get<any[]>(this.apiUrl).pipe(
+      map(sales=>{
+        const productsSales:{ [key: number]: Array<Number> } = {}; 
+        
+        sales.forEach(sale => {
+          if (!productsSales[sale.productId]) {
+            productsSales[sale.productId] =new Array(12).fill(0);
+          }
+          const month = new Date(sale.date).getMonth();
+          productsSales[sale.productId][month] = sale.total;
+          });
+           
+        return productsSales;
+      }
+    )
+  )
   }
 }
 

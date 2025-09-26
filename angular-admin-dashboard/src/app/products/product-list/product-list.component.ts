@@ -7,11 +7,12 @@ import { forkJoin, map } from 'rxjs';
 import { BarChartComponent } from "../../dashboard/layout/bar-chart/bar-chart.component";
 import { Chart, ChartConfiguration } from 'chart.js';
 import { PieChartComponent } from "../../dashboard/layout/pie-chart/pie-chart.component";
+import { LineChartComponent } from "../../dashboard/layout/line-chart/line-chart.component";
 
-
+const months=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 @Component({
   selector: 'app-product-list',
-  imports: [DataTableComponent, StatsCardComponent, BarChartComponent, PieChartComponent],
+  imports: [DataTableComponent, StatsCardComponent, BarChartComponent, PieChartComponent, LineChartComponent],
   templateUrl: './product-list.component.html',
   styleUrl: './product-list.component.scss'
 })
@@ -53,22 +54,41 @@ productSalesBarConfig: any = {
     datasets: [{
       label: 'Category Sales',
       data: [],
-      backgroundColor: [
-        '#EC6B56',
-        '#47B39C',
-        '#FFC154'
-      ],
+      backgroundColor:[],
       hoverOffset: 4
     }]
   },
 };
-  
+  lineChart!: Chart;
+  lineConfig: any = {
+  type: 'line',
+  data: {
+  labels: months,
+  datasets: [{
+    label: '',
+    data: [],
+    fill: false,
+    borderColor: '',
+    tension: 0.1
+  }]
+  }
+  }; 
 
 constructor(private productService: ProductService,
   private salesService: SaleService
 ){}
 
 ngOnInit(){
+  let mappedProducts:{
+    id:any,
+    name:any
+  }[];
+  this.productService.getProducts().pipe(
+    map(products => products.map(product => ({
+      id: product.id,
+      name: product.name
+    })))
+  ).subscribe(mProducts=> mappedProducts=mProducts)
   //best seller
   this.salesService.getBestSeller().subscribe(i=>{
     this.bestSeller.sales=i.totalSold;
@@ -109,6 +129,7 @@ ngOnInit(){
       });
       this.categorySalesBarConfig.data.labels=Object.keys(salesCategories);
       this.categorySalesBarConfig.data.datasets[0].data=Object.values(salesCategories);
+      this.categorySalesBarConfig.data.datasets[0].backgroundColor=this.categorySalesBarConfig.data.labels.map(() => this.getRandomColor());
       this.categorySalesPieChart=new Chart('PieChart', this.categorySalesBarConfig);
 
       let mostSalesCategory="";
@@ -123,12 +144,6 @@ ngOnInit(){
       this.mostSalesCategory.sales = maxQty;
     })
     //product sales barChart
-      this.productService.getProducts().pipe(
-        map(products => products.map(product => ({
-          id: product.id,
-          name: product.name
-        })))
-      ).subscribe(mappedProducts => {
         this.productSalesBarConfig.data.labels= mappedProducts.map(p => p.name);
         let productSalesQty=new Array(mappedProducts.length).fill(0);
          completed.forEach(sale =>{
@@ -136,10 +151,24 @@ ngOnInit(){
         })
         this.productSalesBarConfig.data.datasets[0].data =productSalesQty;
         this.productSalesBarChart=new Chart('BarChart', this.productSalesBarConfig);
-      });
-  })
 
 
+    })
+    
+    
+  this.salesService.getAnualSalesPerProduct().subscribe(productSales => {
+      Object.keys(productSales).forEach(key => {
+        const product = mappedProducts.find(p => p.id == +key);
+        this.lineConfig.data.datasets.push({
+            data: productSales[+key],
+            label: product?.name,
+            borderColor: this.getRandomColor(),
+            fill: false
+        });
+    });
+    this.lineConfig.data.datasets.shift();
+    this.lineChart=new Chart('LineChart', this.lineConfig);  
+    });
 
   
   this.productService.getProducts().subscribe(p =>{
@@ -165,5 +194,13 @@ ngOnInit(){
     this.productTableConfig.dataSource=p;
   } );
 
+}
+
+getRandomColor(): string {
+  const hue = ((Math.random() * (0.360- 0.001) + 0.1)*360).toFixed(2); 
+  console.log(hue);
+  const saturation = 60; // menos saturado → pastel
+  const lightness = 70;  // más claro → pastel
+  return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 }
 }
