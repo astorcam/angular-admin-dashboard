@@ -1,15 +1,26 @@
 {
+
   "users": [
-    { "id": 1, "name": "Alice", "email": "alice@mail.com", "role": "Admin" },
-    { "id": 2, "name": "Bob", "email": "bob@mail.com", "role": "User" },
-    { "id": 3, "name": "Clara", "email": "clara@mail.com", "role": "Manager" },
-    { "id": 4, "name": "David", "email": "david@mail.com", "role": "User" },
-    { "id": 5, "name": "Eva", "email": "eva@mail.com", "role": "User" },
-    { "id": 6, "name": "Frank", "email": "frank@mail.com", "role": "Admin" },
-    { "id": 7, "name": "Grace", "email": "grace@mail.com", "role": "User" },
-    { "id": 8, "name": "Henry", "email": "henry@mail.com", "role": "User" },
-    { "id": 9, "name": "Isabel", "email": "isabel@mail.com", "role": "User" },
-    { "id": 10, "name": "Jack", "email": "jack@mail.com", "role": "User" }
+    { "id": 1, "name": "Alice", "email": "alice@mail.com", "role": "Admin", "status": "Active", "createdAt": "2025-01-15", "lastLogin": "2025-09-25", "country": "Spain", "products": 12, "purchases": 0, "avatar": "https://i.pravatar.cc/150?img=1" },
+    { "id": 2, "name": "Bob", "email": "bob@mail.com", "role": "User", "status": "Active", "createdAt": "2025-03-10", "lastLogin": "2025-09-22", "country": "USA", "products": 3, "purchases": 5, "avatar": "https://i.pravatar.cc/150?img=2" },
+    { "id": 3, "name": "Clara", "email": "clara@mail.com", "role": "Manager", "status": "Suspended", "createdAt": "2025-02-01", "lastLogin": "2025-06-12", "country": "Germany", "products": 0, "purchases": 10, "avatar": "https://i.pravatar.cc/150?img=3" },
+    { "id": 4, "name": "David", "email": "david@mail.com", "role": "User", "status": "Active", "createdAt": "2025-04-05", "lastLogin": "2025-09-24", "country": "France", "products": 7, "purchases": 3, "avatar": "https://i.pravatar.cc/150?img=4" },
+    { "id": 5, "name": "Eva", "email": "eva@mail.com", "role": "User", "status": "Inactive", "createdAt": "2025-05-20", "lastLogin": "2025-08-10", "country": "Italy", "products": 1, "purchases": 2, "avatar": "https://i.pravatar.cc/150?img=5" },
+    { "id": 6, "name": "Frank", "email": "frank@mail.com", "role": "Admin", "status": "Active", "createdAt": "2025-01-28", "lastLogin": "2025-09-21", "country": "UK", "products": 15, "purchases": 1, "avatar": "https://i.pravatar.cc/150?img=6" },
+    { "id": 7, "name": "Grace", "email": "grace@mail.com", "role": "User", "status": "Active", "createdAt": "2025-06-14", "lastLogin": "2025-09-20", "country": "Canada", "products": 2, "purchases": 4, "avatar": "https://i.pravatar.cc/150?img=7" },
+    { "id": 8, "name": "Henry", "email": "henry@mail.com", "role": "User", "status": "Active", "createdAt": "2025-07-01", "lastLogin": "2025-09-18", "country": "Spain", "products": 6, "purchases": 1, "avatar": "https://i.pravatar.cc/150?img=8" },
+    { "id": 9, "name": "Isabel", "email": "isabel@mail.com", "role": "User", "status": "Inactive", "createdAt": "2025-03-15", "lastLogin": "2025-07-30", "country": "Mexico", "products": 0, "purchases": 6, "avatar": "https://i.pravatar.cc/150?img=9" },
+    { "id": 10, "name": "Jack", "email": "jack@mail.com", "role": "User", "status": "Active", "createdAt": "2025-02-22", "lastLogin": "2025-09-23", "country": "USA", "products": 8, "purchases": 0, "avatar": "https://i.pravatar.cc/150?img=10" },
+    { "id": 11, "name": "Karen", "email": "karen@mail.com", "role": "Manager", "status": "Active", "createdAt": "2025-05-18", "lastLogin": "2025-09-15", "country": "Germany", "products": 5, "purchases": 8, "avatar": "https://i.pravatar.cc/150?img=11" },
+    { "id": 12, "name": "Leo", "email": "leo@mail.com", "role": "User", "status": "Suspended", "createdAt": "2025-06-25", "lastLogin": "2025-08-01", "country": "Brazil", "products": 0, "purchases": 1, "avatar": "https://i.pravatar.cc/150?img=12" },
+    { "id": 13, "name": "Maria", "email": "maria@mail.com", "role": "User", "status": "Active", "createdAt": "2025-07-07", "lastLogin": "2025-09-19", "country": "Spain", "products": 4, "purchases": 9, "avatar": "https://i.pravatar.cc/150?img=13" },
+    { "id": 14, "name": "Nina", "email": "nina@mail.com", "role": "User", "status": "Active", "createdAt": "2025-08-02", "lastLogin": "2025-09-25", "country": "Argentina", "products": 2, "purchases": 3, "avatar": "https://i.pravatar.cc/150?img=14" },
+    { "id": 15, "name": "Oscar", "email": "oscar@mail.com", "role": "Admin", "status": "Active", "createdAt": "2025-01-10", "lastLogin": "2025-09-26", "country": "USA", "products": 20, "purchases": 0, "avatar": "https://i.pravatar.cc/150?img=15" },
+    { "id": 16, "name": "Paula", "email": "paula@mail.com", "role": "User", "status": "Inactive", "createdAt": "2025-03-30", "lastLogin": "2025-07-10", "country": "Portugal", "products": 1, "purchases": 7, "avatar": "https://i.pravatar.cc/150?img=16" },
+    { "id": 17, "name": "Quentin", "email": "quentin@mail.com", "role": "User", "status": "Active", "createdAt": "2025-04-18", "lastLogin": "2025-09-12", "country": "France", "products": 9, "purchases": 2, "avatar": "https://i.pravatar.cc/150?img=17" },
+    { "id": 18, "name": "Rosa", "email": "rosa@mail.com", "role": "Manager", "status": "Active", "createdAt": "2025-06-01", "lastLogin": "2025-09-14", "country": "Italy", "products": 2, "purchases": 4, "avatar": "https://i.pravatar.cc/150?img=18" },
+    { "id": 19, "name": "Sam", "email": "sam@mail.com", "role": "User", "status": "Active", "createdAt": "2025-08-15", "lastLogin": "2025-09-24", "country": "USA", "products": 3, "purchases": 1, "avatar": "https://i.pravatar.cc/150?img=19" },
+    { "id": 20, "name": "Tina", "email": "tina@mail.com", "role": "User", "status": "Suspended", "createdAt": "2025-02-05", "lastLogin": "2025-05-20", "country": "Mexico", "products": 0, "purchases": 0, "avatar": "https://i.pravatar.cc/150?img=20" }
   ],
 
   "products": [

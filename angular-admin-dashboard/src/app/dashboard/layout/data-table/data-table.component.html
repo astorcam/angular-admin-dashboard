@@ -13,7 +13,16 @@
         {{ labelMap[col] || col }}
       </th>
       <td mat-cell *matCellDef="let element">
-        {{ element[col] }}
+        <ng-container [ngSwitch]="col">
+          <div *ngSwitchCase="'avatar'" class="avatar-cell">
+          <img [src]="element[col]"
+              [alt]="element.name"
+              width="40"
+              height="40"
+              style="border-radius: 50%" />
+        </div>
+        <span *ngSwitchDefault>{{ element[col] }}</span>
+      </ng-container>
       </td>
     </ng-container>
     
