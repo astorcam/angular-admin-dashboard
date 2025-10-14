@@ -1,6 +1,6 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <!-- Contenido dinámico -->
-    <main class="dashboard-content">
+    <main class="container">
         <h1>Home</h1>
         <h2>Main stats</h2>
         <div class="fast-stats">
@@ -9,21 +9,19 @@
            <app-stats-card statsTitle="Total Users" statsIcon="group" [statsValue]=totalUsers statsText=""></app-stats-card>
            <app-stats-card statsTitle="Total Products" statsIcon="inventory_2" [statsValue]=totalProducts statsText=""></app-stats-card>
         </div> 
-        <div class="chart-container">
           <div class="row">
             <h2>Charts</h2>
             <div class="col-6">
-              <app-bar-chart [chart]="barChart"></app-bar-chart>   
+                <app-bar-chart [chart]="barChart"></app-bar-chart>   
             </div>
             <div class="col-6">
-              <app-line-chart [chart]="lineChart"></app-line-chart>     
+              <app-line-chart [chart]="lineChart"></app-line-chart> 
             </div>
+          </div>
             <h2>User's information</h2>
             <app-data-table 
                 [columns]="userTableConfig.columns"
                 [displayedColumns]="userTableConfig.displayedColumns"
                 [dataSource]="userTableConfig.dataSource">
             </app-data-table>
-          </div>
-        </div> 
     </main>

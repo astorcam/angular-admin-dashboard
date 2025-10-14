@@ -2,17 +2,18 @@
 @use '@angular/material' as mat;
 
 .table-container{
-  margin: 1.5rem;
-padding: 1.5rem;
-background: white;
-box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
-border-radius: 12px;
+  padding: 1.5rem;
+     margin: 1.5rem;
+    background-color: rgb(255, 255, 255);
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    border-radius: 0.75rem;
 }
 table {
   width: 100%;
    @include mat.table-overrides((
   header-headline-size:1.5rem,
-  header-headline-weight: bold
+  header-headline-font: "Roboto",
+  header-headline-color:#101720  
   ));
   
 .mat-mdc-form-field {
@@ -28,4 +29,30 @@ td, th {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+span{
+  font-size: 0.875rem;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; 
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.add-button {
+  margin-left: auto;
+    padding: 10px;
+    border: none;
+    background-color: white;
+    color: #44a5fa;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      color: #173753;
+    } 
 }

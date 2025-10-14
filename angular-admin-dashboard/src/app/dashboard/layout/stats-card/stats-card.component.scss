@@ -1,15 +1,33 @@
+@use '@angular/material' as mat;
+
 mat-card{
     display: inline-flex;
     width: 20rem ;
     text-align: left;
-    background-color: rgb(255, 255, 255);
+background-image: linear-gradient(to top, #ffffff 0%, #f8e5c1 100%);
     box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
     min-height: fit-content;
+    padding-bottom: 1rem;
 }
-button{
-    width: 100%;
-    border-radius: 12px;
-    background: #101720 !important;;
-    box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
-
+.mat-mdc-card-title {
+    font-family: "Roboto", sans-serif;
+    font-size: 1.25rem;
+    color: #101720;
+}
+.data-subtitle{
+    font-family: "Nunito", sans-serif;
+    font-weight: lighter;
+    color: #666666;
+      font-size: 1rem;;
+}
+.data{
+    margin-top: 0.5rem;
+    font-size: 1.75rem;
+    color: #101720;
+}
+mat-icon{
+    flex-shrink: 0;
+    padding-bottom: 0.4rem;
+    height: auto;
+    vertical-align: middle;
 }

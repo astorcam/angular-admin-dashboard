@@ -4,7 +4,7 @@ $sidenav-color:#173753;
 .mat-sidenav-container{
     background-color: $sidenav-color;
     height: 100%!important;
-
+    width: 100%!important;
 }
 
 
@@ -26,4 +26,7 @@ mat-icon{
     padding-bottom: 0.4rem;
     height: auto;
     vertical-align: middle;
+}
+span{
+    font-size: 1.25rem;
 }

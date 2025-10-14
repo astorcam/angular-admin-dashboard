@@ -1,6 +1,7 @@
 $dashboard-bg:#f2f3f4;
 
 .dashboard-container {
+  width: 100%;
   height: 100vh;
   background-color: $dashboard-bg;
 }
@@ -9,4 +10,9 @@ h1{
   font-family: "Liter", sans-serif;
   font-weight: 400;
   font-style: normal;
+}
+
+.sidenav{
+  width: 20rem;
+  border-radius: 0;
 }

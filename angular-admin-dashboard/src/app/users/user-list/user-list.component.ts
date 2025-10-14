@@ -4,22 +4,42 @@ import { DataTableComponent } from "../../dashboard/layout/data-table/data-table
 import { PieChartComponent } from "../../dashboard/layout/pie-chart/pie-chart.component";
 import { BarChartComponent } from "../../dashboard/layout/bar-chart/bar-chart.component";
 import { LineChartComponent } from "../../dashboard/layout/line-chart/line-chart.component";
-import { Chart } from 'chart.js';
+import { Chart, ChartConfiguration } from 'chart.js';
 import { UserService } from '../../services/user.service';
+import { UserFormComponent } from "../user-form/user-form.component";
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-user-list',
-  imports: [StatsCardComponent, DataTableComponent, PieChartComponent, BarChartComponent, LineChartComponent],
+  imports: [StatsCardComponent, DataTableComponent, PieChartComponent, UserFormComponent, CommonModule],
   templateUrl: './user-list.component.html',
   styleUrl: './user-list.component.scss'
 })
 export class UserListComponent {
-usersTableConfig:any={
-  columns:[],
-  displayedColumns:[{}],
-  dataSource:[{}]
+  usersTableConfig:any={
+    columns:[],
+    displayedColumns:[{}],
+    dataSource:[{}]
+  };
+  usersRolesPieConfig = {
+    labels: [] as string[],
+    datasets: [
+    {
+      label: 'Total users',
+      data: [] as number[],
+    }
+  ]
 };
-usersRolesPieChart!: Chart;
+usersCountryPieConfig= {
+  labels: [] as string[],
+  datasets: [
+    {
+      label: 'Total users',
+      data: [] as number[],
+    }
+  ]
+};
+
 usersCountryBarChart: any;
 newUsersLineChart!: Chart;
 totalUsers!: number;
@@ -27,6 +47,7 @@ newUsers!: number;
 usersSuspended!: number;
 activeUsers!: number;
 
+showUserForm: boolean=false;
 
 constructor(private userService: UserService){}
 
@@ -35,7 +56,7 @@ ngOnInit(){
   const dd = String(date.getDate()).padStart(2, '0');
   const mm = String(date.getMonth() + 1).padStart(2, '0');
   const yyyy = date.getFullYear();
-
+  
   const today = `${yyyy}/${mm}/${dd}`;
   this.userService.getUsers().subscribe(users=>{
     this.totalUsers=users.length;
@@ -46,15 +67,57 @@ ngOnInit(){
       return year === yyyy.toString() && month === mm;
     }).length;
     //user table config
-      const keys = Object.keys(users[0]);
-      this.usersTableConfig.columns=keys;
-      this.usersTableConfig.displayedColumns = keys.map(k => ({
+    const keys = Object.keys(users[0]);
+    this.usersTableConfig.columns=keys;
+    this.usersTableConfig.displayedColumns = keys.map(k => ({
       key: k,
       label: k.charAt(0).toUpperCase() + k.slice(1)
     }));
-      this.usersTableConfig.dataSource=users;
-  })
-
+    this.usersTableConfig.dataSource=users;
+    const userRoles: { [key: string]: number } = {}; 
+    const userCountry: { [key: string]: number } = {}; 
+    users.forEach(user => {
+      userRoles[user.role] = (userRoles[user.role] || 0) + 1;
+      userCountry[user.country] = (userCountry[user.country] || 0) + 1;
+    });
+    this.usersRolesPieConfig = {
+      labels: Object.keys(userRoles),
+      datasets: [
+        {
+          label: "Total users",
+          data: Object.values(userRoles)
+        }
+      ]
+    };
+    
+    this.usersCountryPieConfig = {
+      labels: Object.keys(userCountry),
+      datasets: [
+          {
+            label: "Total users",
+            data: Object.values(userCountry)
+          }
+        ]
+      };
+    })
+    
+  }
+  
+  onUserAdded(user: any) {
+  console.log('Producto agregado:', user);
+    this.showUserForm = false;  
+  }
+  onUserCancel() {
+    console.log("User canceled")
+  this.showUserForm=false;
+  }
+  openForm() {
+    this.showUserForm=true;
+  }
+  getRandomColor(): string {
+    const hue = ((Math.random() * (0.360- 0.001) + 0.1)*360).toFixed(2); 
+  const saturation = 60; 
+  const lightness = 70; 
+  return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 }
-
 }

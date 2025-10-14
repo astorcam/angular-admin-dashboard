@@ -56,7 +56,10 @@ export class HomeComponent {
     borderColor: '#47B39C',
     tension: 0.1
   }]
-}
+},
+    options: {
+        responsive: true
+      }
 };
 userTableConfig:any={
   columns:[],

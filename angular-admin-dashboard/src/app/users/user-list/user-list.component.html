@@ -4,27 +4,43 @@
     <h1>Users</h1>
     <h2>Main stats</h2>
         <div class="fast-stats">
-           <app-stats-card statsTitle="Total Users" statsIcon="sell" statsText="" [statsValue]="totalUsers"></app-stats-card>
-           <app-stats-card statsTitle="New This Month" statsIcon="sell" statsText="" [statsValue]="newUsers"></app-stats-card>
-           <app-stats-card statsTitle="Suspended" statsIcon="sell" statsText="" [statsValue]="usersSuspended"></app-stats-card>
-           <app-stats-card statsTitle="Active Today" statsIcon="warning" statsText="" [statsValue]="activeUsers"></app-stats-card>
+           <app-stats-card statsTitle="Total Users" statsIcon="group" statsText="" [statsValue]="totalUsers"></app-stats-card>
+           <app-stats-card statsTitle="New This Month" statsIcon="trending_up" statsText="" [statsValue]="newUsers"></app-stats-card>
+           <app-stats-card statsTitle="Suspended" statsIcon="pan_tool" statsText="" [statsValue]="usersSuspended"></app-stats-card>
+           <app-stats-card statsTitle="Active Today" statsIcon="history" statsText="" [statsValue]="activeUsers"></app-stats-card>
         </div> 
     <h2>General information</h2>
-    <app-data-table 
+    <app-user-form *ngIf="showUserForm" (userAdded)="onUserAdded($event)" (userCanceled)="onUserCancel()"></app-user-form>
+    <app-data-table
+        [type]="'users'"
+        (addClicked)="openForm()" 
         [columns]="usersTableConfig.columns"
         [displayedColumns]="usersTableConfig.displayedColumns"
         [dataSource]="usersTableConfig.dataSource">
     </app-data-table>
     <h2>Charts</h2>
-    <div class="chart-container">
-        <!-- <div class="row">
+    <div class="container">
+        <div class="row">
             <div class="col-6">
-                <app-pie-chart [chart]="usersRolesPieChart"></app-pie-chart>
+                    <app-pie-chart
+                    [labels]="usersRolesPieConfig.labels"
+                    [data]="usersRolesPieConfig.datasets[0].data"
+                    title="Users' roles" 
+                    [label]="usersRolesPieConfig.datasets[0].label">
+                </app-pie-chart>
             </div>
             <div class="col-6">
-                <app-bar-chart [chart]="usersCountryBarChart"></app-bar-chart>
-                <app-line-chart [chart]="newUsersLineChart"></app-line-chart>     
-            </div>
-        </div> -->
+                <app-pie-chart 
+                [labels]="usersCountryPieConfig.labels"
+                [data]="usersCountryPieConfig.datasets[0].data"
+                title="Users' countries" 
+                [label]="usersCountryPieConfig.datasets[0].label">
+            </app-pie-chart>
+        </div>
     </div>
+    </div>
+    <!-- <div class="col-6">
+        <app-bar-chart [chart]="usersCountryBarChart"></app-bar-chart>
+        <app-line-chart [chart]="newUsersLineChart"></app-line-chart>     
+        </div> -->
 </div>

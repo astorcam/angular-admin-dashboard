@@ -8,71 +8,69 @@ import { BarChartComponent } from "../../dashboard/layout/bar-chart/bar-chart.co
 import { Chart, ChartConfiguration } from 'chart.js';
 import { PieChartComponent } from "../../dashboard/layout/pie-chart/pie-chart.component";
 import { LineChartComponent } from "../../dashboard/layout/line-chart/line-chart.component";
+import { ProductFormComponent } from "../product-form/product-form.component";
+import { CommonModule } from '@angular/common';
 
 const months=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 @Component({
   selector: 'app-product-list',
-  imports: [DataTableComponent, StatsCardComponent, BarChartComponent, PieChartComponent, LineChartComponent],
+  imports: [CommonModule,DataTableComponent, StatsCardComponent, BarChartComponent, LineChartComponent, PieChartComponent, ProductFormComponent],
   templateUrl: './product-list.component.html',
   styleUrl: './product-list.component.scss'
 })
 export class ProductListComponent {
-productTableConfig:any={
-  columns:[],
-  displayedColumns:[{}],
-  dataSource:[{}]
-}
-bestSeller: any = {};
-worstSeller: any = {};
-lowStock: any = {};
-mostSalesCategory: any = {};
-productSalesBarChart!: Chart;
-productSalesBarConfig: any = {
+  productTableConfig:any={
+    columns:[],
+    displayedColumns:[{}],
+    dataSource:[{}]
+  }
+  bestSeller: any = {};
+  worstSeller: any = {};
+  lowStock: any = {};
+  mostSalesCategory: any = {};
+  productSalesBarChart!: Chart;
+  productSalesBarConfig: any = {
     type: 'bar',
     data: {
-       labels: [],
-       datasets: [
-      { 
-        label: 'Product sales',
-        data: [],
-        backgroundColor: '#FFC154',
-        borderColor: '#0e1f2eff',
-        borderWidth: 1
-      }
-    ]
+      labels: [],
+      datasets: [
+        { 
+          label: 'Product sales',
+          data: [],
+          backgroundColor: '#FFC154',
+          borderColor: '#0e1f2eff',
+          borderWidth: 1
+        }
+      ]
     },
     options: {
-      responsive: true
-    }
-  };
-
-  categorySalesPieChart!: Chart;
-  categorySalesBarConfig:ChartConfiguration<'pie'> = {
-  type: 'pie',
-  data: {
-    labels: [],
-    datasets: [{
-      label: 'Category Sales',
-      data: [],
-      backgroundColor:[],
-      hoverOffset: 4
-    }]
-  },
+    responsive: true
+  }
 };
-  lineChart!: Chart;
-  lineConfig: any = {
+categorySalesPieConfig= {
+  labels: [] as string[],
+  datasets: [
+    {
+      label: 'Total sales',
+      data: [] as number[],
+    }
+  ]
+};
+lineChart!: Chart;
+lineConfig: any = {
   type: 'line',
   data: {
-  labels: months,
-  datasets: [{
-    label: '',
-    data: [],
-    fill: false,
-    borderColor: '',
-    tension: 0.1
-  }]
+    labels: months,
+    datasets: [{
+      label: '',
+      data: [],
+      fill: false,
+      borderColor: '',
+      tension: 0.1
+    }]
   }
-  }; 
+}; 
+showProductForm: boolean=false;
 
 constructor(private productService: ProductService,
   private salesService: SaleService
@@ -127,11 +125,16 @@ ngOnInit(){
       results.forEach(r => {
         salesCategories[r.category] = (salesCategories[r.category] || 0) + r.qty;
       });
-      this.categorySalesBarConfig.data.labels=Object.keys(salesCategories);
-      this.categorySalesBarConfig.data.datasets[0].data=Object.values(salesCategories);
-      this.categorySalesBarConfig.data.datasets[0].backgroundColor=this.categorySalesBarConfig.data.labels.map(() => this.getRandomColor());
-      this.categorySalesPieChart=new Chart('PieChart', this.categorySalesBarConfig);
-
+      this.categorySalesPieConfig = {
+        labels: Object.keys(salesCategories),
+        datasets: [
+          {
+            label: "Total sales",
+            data: Object.values(salesCategories)
+          }
+        ]
+      };
+      
       let mostSalesCategory="";
       let maxQty = 0;
       for (const category in salesCategories) {
@@ -144,32 +147,32 @@ ngOnInit(){
       this.mostSalesCategory.sales = maxQty;
     })
     //product sales barChart
-        this.productSalesBarConfig.data.labels= mappedProducts.map(p => p.name);
-        let productSalesQty=new Array(mappedProducts.length).fill(0);
-         completed.forEach(sale =>{
-          productSalesQty[Number(sale.productId)-1]+=sale.quantity;
-        })
-        this.productSalesBarConfig.data.datasets[0].data =productSalesQty;
-        this.productSalesBarChart=new Chart('BarChart', this.productSalesBarConfig);
-
-
+    this.productSalesBarConfig.data.labels= mappedProducts.map(p => p.name);
+    let productSalesQty=new Array(mappedProducts.length).fill(0);
+    completed.forEach(sale =>{
+      productSalesQty[Number(sale.productId)-1]+=sale.quantity;
     })
+    this.productSalesBarConfig.data.datasets[0].data =productSalesQty;
+    this.productSalesBarChart=new Chart('BarChart', this.productSalesBarConfig);
     
     
+  })
+  
+  
   this.salesService.getAnualSalesPerProduct().subscribe(productSales => {
-      Object.keys(productSales).forEach(key => {
-        const product = mappedProducts.find(p => p.id == +key);
-        this.lineConfig.data.datasets.push({
-            data: productSales[+key],
-            label: product?.name,
-            borderColor: this.getRandomColor(),
-            fill: false
-        });
+    Object.keys(productSales).forEach(key => {
+      const product = mappedProducts.find(p => p.id == +key);
+      this.lineConfig.data.datasets.push({
+        data: productSales[+key],
+        label: product?.name,
+        borderColor: this.getRandomColor(),
+        fill: false
+      });
     });
     this.lineConfig.data.datasets.shift();
     this.lineChart=new Chart('LineChart', this.lineConfig);  
-    });
-
+  });
+  
   
   this.productService.getProducts().subscribe(p =>{
     //lowest stock
@@ -188,17 +191,31 @@ ngOnInit(){
     const keys = Object.keys(p[0]);
     this.productTableConfig.columns=keys;
     this.productTableConfig.displayedColumns = keys.map(k => ({
-    key: k,
-    label: k.charAt(0).toUpperCase() + k.slice(1)
-  }));
+      key: k,
+      label: k.charAt(0).toUpperCase() + k.slice(1)
+    }));
     this.productTableConfig.dataSource=p;
   } );
-
+  
 }
 
+
+onProductAdded(product: any) {
+  console.log('Producto agregado:', product);
+  this.showProductForm = false;
+}
+onProductCanceled() {
+ console.log('Producto cancelado');
+  this.showProductForm = false;
+}
+
+openForm() {
+  if (this.showProductForm == false) {
+    this.showProductForm = true;
+  } 
+}
 getRandomColor(): string {
   const hue = ((Math.random() * (0.360- 0.001) + 0.1)*360).toFixed(2); 
-  console.log(hue);
   const saturation = 60; // menos saturado → pastel
   const lightness = 70;  // más claro → pastel
   return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
