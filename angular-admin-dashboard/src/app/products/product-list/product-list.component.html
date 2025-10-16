@@ -2,23 +2,22 @@
 
 <div class="container">
     <h1>Products</h1>
-    <h2>Main stats</h2>
         <div class="fast-stats">
            <app-stats-card statsTitle="Most Sales Category" statsIcon="sell" [statsText]="mostSalesCategory.category" [statsValue]="mostSalesCategory.sales"></app-stats-card>
            <app-stats-card statsTitle="Best Seller" statsIcon="grade" [statsText]="bestSeller.name" [statsValue]="bestSeller.sales"></app-stats-card>
            <app-stats-card statsTitle="Worst Seller" statsIcon="thumb_down" [statsText]="worstSeller.name" [statsValue]="worstSeller.sales"></app-stats-card>
            <app-stats-card statsTitle="Lowest Stock" statsIcon="warning" [statsText]="lowStock.name" [statsValue]="lowStock.stock"></app-stats-card>
         </div> 
-    <h2>General information</h2>
     <app-product-form *ngIf="showProductForm" (productAdded)="onProductAdded($event)" (productCanceled)="onProductCanceled()"></app-product-form>
     <app-data-table
+        [title]="''"
         [type]="'products'"
         (addClicked)="openForm()" 
         [columns]="productTableConfig.columns"
         [displayedColumns]="productTableConfig.displayedColumns"
         [dataSource]="productTableConfig.dataSource">
     </app-data-table>
-    <h2>Charts</h2>
+    <div class="charts-container">
         <div class="row">
             <div class="col-6">
                  <app-pie-chart 
@@ -30,7 +29,12 @@
             </div>
             <div class="col-6">
                 <app-bar-chart [chart]="productSalesBarChart"></app-bar-chart>
-                <app-line-chart [chart]="lineChart"></app-line-chart>     
+                <app-line-chart
+                 [labels]="productSalesLineConfig.labels"
+                [dataset]="productSalesLineConfig.datasets"
+                title="Sales per categories" 
+                ></app-line-chart>     
             </div>
+        </div>
         </div>
 </div>

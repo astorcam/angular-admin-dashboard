@@ -56,20 +56,16 @@ categorySalesPieConfig= {
     }
   ]
 };
-lineChart!: Chart;
-lineConfig: any = {
-  type: 'line',
-  data: {
-    labels: months,
-    datasets: [{
-      label: '',
-      data: [],
-      fill: false,
-      borderColor: '',
-      tension: 0.1
-    }]
-  }
-}; 
+productSalesLineConfig= {
+  labels: [] as string[],
+  datasets: [
+    {
+      label: 'Total sales',
+      data: [] as number[],
+      borderColor:'color' as string
+    }
+  ]
+};
 showProductForm: boolean=false;
 
 constructor(private productService: ProductService,
@@ -158,21 +154,23 @@ ngOnInit(){
     
   })
   
-  
-  this.salesService.getAnualSalesPerProduct().subscribe(productSales => {
-    Object.keys(productSales).forEach(key => {
-      const product = mappedProducts.find(p => p.id == +key);
-      this.lineConfig.data.datasets.push({
-        data: productSales[+key],
-        label: product?.name,
-        borderColor: this.getRandomColor(),
-        fill: false
-      });
-    });
-    this.lineConfig.data.datasets.shift();
-    this.lineChart=new Chart('LineChart', this.lineConfig);  
+// sales per product line chart  
+this.salesService.getAnualSalesPerProduct().subscribe(productSales => {
+  const datasets = Object.keys(productSales).map(key => {
+    const product = mappedProducts.find(p => p.id == +key);
+    return {
+      label: product?.name ,
+      data: productSales[+key],
+      borderColor: this.getRandomColor(),
+    };
   });
-  
+
+  this.productSalesLineConfig = {
+    labels: months,
+    datasets: datasets 
+  };
+});
+
   
   this.productService.getProducts().subscribe(p =>{
     //lowest stock

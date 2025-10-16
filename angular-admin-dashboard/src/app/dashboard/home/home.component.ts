@@ -11,12 +11,15 @@ import { BarChartComponent } from '../layout/bar-chart/bar-chart.component';
 import { Chart } from 'chart.js';
 import { LineChartComponent } from "../layout/line-chart/line-chart.component";
 import { DataTableComponent } from "../layout/data-table/data-table.component";
+import { CommonModule } from '@angular/common';
+import { SaleFormComponent } from "../sales/sale-form/sale-form.component";
+import { forkJoin } from 'rxjs';
 
 
 const months=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 @Component({
   selector: 'app-home',
-  imports: [RouterModule, StatsCardComponent, BarChartComponent, MatSidenavModule, LineChartComponent, DataTableComponent],
+  imports: [CommonModule, RouterModule, StatsCardComponent, BarChartComponent, MatSidenavModule, LineChartComponent, DataTableComponent, SaleFormComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
@@ -45,27 +48,28 @@ export class HomeComponent {
         responsive: true
       }
   };
-  lineConfig: any = {
-  type: 'line',
-  data: {
-  labels: months,
-  datasets: [{
-    label: 'Anual Profits',
-    data: [],
-    fill: false,
-    borderColor: '#47B39C',
-    tension: 0.1
-  }]
-},
-    options: {
-        responsive: true
-      }
+
+  anualProfitLineConfig= {
+  labels: [] as string[],
+  datasets: [
+    {
+      label: 'Total sales',
+      data: [] as number[],
+      borderColor:'color' as string
+    }
+  ]
 };
-userTableConfig:any={
+
+salesTableConfig:any={
   columns:[],
   displayedColumns:[{}],
   dataSource:[{}]
 }
+
+users: any[] = [];
+products: any[] = [];
+showSaleForm: boolean=false;
+
 
   constructor(private userService: UserService,
      private productService: ProductService,
@@ -75,29 +79,82 @@ userTableConfig:any={
 ngOnInit(){
   this.userService.getUsers().subscribe(u => {
     this.totalUsers = u.length
-    const keys = Object.keys(u[0]);
-    this.userTableConfig.columns=keys;
-    this.userTableConfig.displayedColumns = keys.map(k => ({
-    key: k,
-    label: k.charAt(0).toUpperCase() + k.slice(1)
-  }));
-    this.userTableConfig.dataSource=u;
+    this.users = u
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 5);
+  });
 
-});
   this.productService.getProducts().subscribe(p => this.totalProducts = p.length);
-  this.saleService.getSales().subscribe(s => this.totalSales = s.length);
-  this.saleService.getAnualSales().subscribe(monthlySales => {
-    this.barConfig.data.datasets[0].data = monthlySales;
-    this.barChart=new Chart('BarChart', this.barConfig);
-    });
-  this.saleService.getAnualProfits().subscribe(monthlyProfits => {
-    this.lineConfig.data.datasets[0].data = monthlyProfits;
-    this.lineChart=new Chart('LineChart', this.lineConfig);  
-    });
+  this.saleService.getSales().subscribe(s =>{
+  this.totalSales = s.length;
+  const keys = Object.keys(s[0]);
+  this.salesTableConfig.columns=keys;
+  this.salesTableConfig.displayedColumns = keys.map(k => ({
+  key: k,
+  label: k.charAt(0).toUpperCase() + k.slice(1)
+}));
+  this.salesTableConfig.dataSource=s.reverse();
+    } 
+  )
+this.saleService.getAnualSales().subscribe(monthlySales => {
+  this.barConfig.data.datasets[0].data = monthlySales;
+  this.barChart = new Chart('BarChart', this.barConfig);
+});
+  this.saleService.getAnualProfits().subscribe(profitsByYear => {
+
+    const datasets = Object.keys(profitsByYear).map(year => ({
+    label: `Profits ${year}`,
+    data: profitsByYear[+year],
+    borderColor: this.getRandomColor(),
+    }))
+    this.anualProfitLineConfig = {
+    labels: months,
+    datasets: datasets 
+  };
+  });
+
   this.saleService.getProfit().subscribe(value => {
   this.profit = value;
-  
   });
+
+this.saleService.getTopProductsOfYear().subscribe(top5 => {
+  const productRequests = top5.map(sale =>
+    this.productService.getProductById(sale.productId)
+  );
+
+  forkJoin(productRequests).subscribe(productsData => {
+    this.products = productsData
+      .filter(p => !!p)
+      .map((product, i) => ({
+        top:i+1,
+        name: product.name,
+        category:product.category,
+        stock: product.stock,
+        totalSold: top5[i].quantity
+      }));
+  });
+});
 }
 
+
+onSaleAdded(sale: any) {
+  console.log('Sale agregado:', sale);
+  this.showSaleForm = false;
+}
+onSaleCanceled() {
+ console.log('Producto cancelado');
+  this.showSaleForm = false;
+}
+
+openForm() {
+  if (this.showSaleForm == false) {
+    this.showSaleForm = true;
+  } 
+}
+getRandomColor(): string {
+  const hue = ((Math.random() * (0.360- 0.001) + 0.1)*360).toFixed(2); 
+  const saturation = 60; // menos saturado → pastel
+  const lightness = 70;  // más claro → pastel
+  return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+}
 }

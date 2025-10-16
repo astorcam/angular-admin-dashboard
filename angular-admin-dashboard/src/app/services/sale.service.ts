@@ -32,18 +32,26 @@ export class SaleService {
       )
     )
   }
-  getAnualProfits(){
-    return this.http.get<any[]>(this.apiUrl).pipe(
-      map(sales=>{
-        const monthlyProfits = new Array(12).fill(0);
-        sales.forEach(sale => {
-          const month = new Date(sale.date).getMonth(); 
-          monthlyProfits[month] += sale.total; 
-        });
-        return monthlyProfits;
-      }
-    )
-  )
+  getAnualProfits() {
+  return this.http.get<any[]>(this.apiUrl).pipe(
+    map(sales => {
+      const profitsByYear: Record<number, number[]> = {};
+
+      sales.forEach(sale => {
+        const date = new Date(sale.date);
+        const year = date.getFullYear();
+        const month = date.getMonth();
+
+        if (!profitsByYear[year]) {
+          profitsByYear[year] = new Array(12).fill(0);
+        }
+
+        profitsByYear[year][month] += sale.total;
+      });
+
+      return profitsByYear;
+    })
+  );
 }
 getBestSeller() {
   return this.http.get<any[]>(this.apiUrl).pipe(
@@ -94,7 +102,7 @@ getBestSeller() {
   getAnualSalesPerProduct() {
     return this.http.get<any[]>(this.apiUrl).pipe(
       map(sales=>{
-        const productsSales:{ [key: number]: Array<Number> } = {}; 
+        const productsSales:{ [key: number]: Array<number> } = {}; 
         
         sales.forEach(sale => {
           if (!productsSales[sale.productId]) {
@@ -109,5 +117,26 @@ getBestSeller() {
     )
   )
   }
+
+  getTopProductsOfYear() {
+  return this.http.get<any[]>(this.apiUrl).pipe(
+    map(sales => {
+      const totalsByProduct: Record<number, number> = {};
+
+      sales.forEach(sale => {
+        // Sumamos la cantidad total por producto en el año
+        totalsByProduct[sale.productId] = (totalsByProduct[sale.productId] || 0) + sale.quantity;
+      });
+
+      // Convertimos a array y ordenamos
+      const sorted = Object.entries(totalsByProduct)
+        .map(([productId, quantity]) => ({ productId: +productId, quantity }))
+        .sort((a, b) => b.quantity - a.quantity);
+
+      // Retornar los 5 mejores
+      return sorted.slice(0, 5);
+    })
+  );
+}
 }
 

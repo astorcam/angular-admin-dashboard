@@ -19,7 +19,8 @@ import {MatButtonModule} from '@angular/material/button';
 })
 
 export class DataTableComponent {
-  @Input() type!: 'products' | 'users';
+  @Input() type!: 'products' | 'users' |'sales';
+  @Input() title!: string;
   @Output() addClicked = new EventEmitter<void>();
   @Input() columns: string[] = []; 
   @Input() displayedColumns: { key: string, label: string }[] = [];

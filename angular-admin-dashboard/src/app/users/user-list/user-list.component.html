@@ -2,23 +2,21 @@
 
 <div class="dashboard-content">
     <h1>Users</h1>
-    <h2>Main stats</h2>
         <div class="fast-stats">
            <app-stats-card statsTitle="Total Users" statsIcon="group" statsText="" [statsValue]="totalUsers"></app-stats-card>
            <app-stats-card statsTitle="New This Month" statsIcon="trending_up" statsText="" [statsValue]="newUsers"></app-stats-card>
            <app-stats-card statsTitle="Suspended" statsIcon="pan_tool" statsText="" [statsValue]="usersSuspended"></app-stats-card>
            <app-stats-card statsTitle="Active Today" statsIcon="history" statsText="" [statsValue]="activeUsers"></app-stats-card>
         </div> 
-    <h2>General information</h2>
     <app-user-form *ngIf="showUserForm" (userAdded)="onUserAdded($event)" (userCanceled)="onUserCancel()"></app-user-form>
     <app-data-table
+        [title]="''"
         [type]="'users'"
         (addClicked)="openForm()" 
         [columns]="usersTableConfig.columns"
         [displayedColumns]="usersTableConfig.displayedColumns"
         [dataSource]="usersTableConfig.dataSource">
     </app-data-table>
-    <h2>Charts</h2>
     <div class="container">
         <div class="row">
             <div class="col-6">

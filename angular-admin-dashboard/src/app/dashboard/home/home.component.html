@@ -2,26 +2,58 @@
     <!-- Contenido dinámico -->
     <main class="container">
         <h1>Home</h1>
-        <h2>Main stats</h2>
         <div class="fast-stats">
            <app-stats-card statsTitle="Total Sales" statsIcon="sell" [statsValue]=totalSales statsText=""></app-stats-card>
-           <app-stats-card statsTitle="Profit" statsIcon="attach_money" [statsValue]=profit statsText=""></app-stats-card>
+           <app-stats-card statsTitle="Profit" statsIcon="attach_money" [statsValue]="profit" statsFormat="€" statsText=""></app-stats-card>
            <app-stats-card statsTitle="Total Users" statsIcon="group" [statsValue]=totalUsers statsText=""></app-stats-card>
            <app-stats-card statsTitle="Total Products" statsIcon="inventory_2" [statsValue]=totalProducts statsText=""></app-stats-card>
         </div> 
           <div class="row">
-            <h2>Charts</h2>
             <div class="col-6">
                 <app-bar-chart [chart]="barChart"></app-bar-chart>   
             </div>
             <div class="col-6">
-              <app-line-chart [chart]="lineChart"></app-line-chart> 
+              <app-line-chart 
+              [labels]="anualProfitLineConfig.labels"
+                [dataset]="anualProfitLineConfig.datasets"
+                title="Anual Profit">
+              </app-line-chart> 
             </div>
           </div>
-            <h2>User's information</h2>
-            <app-data-table 
-                [columns]="userTableConfig.columns"
-                [displayedColumns]="userTableConfig.displayedColumns"
-                [dataSource]="userTableConfig.dataSource">
+          <app-sale-form *ngIf="showSaleForm" (saleAdded)="onSaleAdded($event)" (saleCancel)="onSaleCanceled()"></app-sale-form>
+          <app-data-table
+                [title]="'Last Sales'"
+                [type]="'sales'"
+                (addClicked)="openForm()" 
+                [columns]="salesTableConfig.columns"
+                [displayedColumns]="salesTableConfig.displayedColumns"
+                [dataSource]="salesTableConfig.dataSource">
             </app-data-table>
+            <div class="row">
+              <div class="col-6">
+
+                <div class="user-list">
+                  <h2>New Users</h2>
+                  <li *ngFor="let user of users" class="list-group-item d-flex align-items-center">
+                    <img [src]="user.avatar" alt="avatar" class="rounded-circle me-2" width="40" height="40">
+                    <div>
+                      <strong>{{ user.name }}</strong> — {{ user.country }} <br>
+                      <small>Role: {{ user.role }} | Status: {{ user.status }}</small>
+                    </div>
+                  </li>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="user-list">
+                  <h2>Top Products</h2>
+                  <li *ngFor="let product of products" class="list-group-item d-flex align-items-center">
+                  <span class="rank">{{ product.top }}</span>
+                    <div>
+                      <strong>{{ product.name }}</strong> — {{ product.category }} <br>
+                      <small>Sales: {{ product.totalSold }} | Stock: {{ product.stock }}</small>
+                    </div>
+                  </li>
+                </div>
+              </div>
+          </div>
     </main>
