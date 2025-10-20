@@ -1,9 +1,13 @@
 
 $toolbar-color:#ffffff;
 
-mat-toolbar{
-    background-color: $toolbar-color;
-    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+mat-toolbar {
+  background-color: $toolbar-color;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  display: flex;
+   align-items: center;
+  justify-content: flex-end;
+  padding: 0;
 }
 mat-menu{
   max-width: fit-content;
@@ -14,13 +18,29 @@ mat-menu{
 }
 button {
     padding: 10px;
+    vertical-align: middle;
     border: none;
-    background-color: white;
+    background-color: none;
     color: #44a5fa;
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.2s ease;
 
     &:hover {
-      color: #173753;
+      color: #f8c973;
     } }
+
+
+.user-app-menu {
+  background-image: linear-gradient(to right, #44a5fa 0%, #173753 100%);
+  display: flex;
+
+  align-items: center;
+  padding: 0.5rem 1rem;
+  color: white;
+  height: 100%; // ahora sí llenará el alto del toolbar
+
+  span {
+    color: white;
+  }
+}
