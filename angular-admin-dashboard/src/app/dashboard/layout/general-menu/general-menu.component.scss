@@ -5,9 +5,22 @@ mat-toolbar{
     background-color: $toolbar-color;
     box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 }
-
+mat-menu{
+  max-width: fit-content;
+}
 .fill-remaining-space {
-  /* This fills the remaining space, by using flexbox. 
-     Every toolbar row uses a flexbox row layout. */
+
   flex: 1 1 auto;
 }
+button {
+    padding: 10px;
+    border: none;
+    background-color: white;
+    color: #44a5fa;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      color: #173753;
+    } }

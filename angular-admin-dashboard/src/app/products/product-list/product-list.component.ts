@@ -28,25 +28,18 @@ export class ProductListComponent {
   worstSeller: any = {};
   lowStock: any = {};
   mostSalesCategory: any = {};
-  productSalesBarChart!: Chart;
-  productSalesBarConfig: any = {
-    type: 'bar',
-    data: {
-      labels: [],
-      datasets: [
-        { 
-          label: 'Product sales',
-          data: [],
-          backgroundColor: '#FFC154',
-          borderColor: '#0e1f2eff',
-          borderWidth: 1
-        }
-      ]
-    },
-    options: {
-    responsive: true
-  }
-};
+  productSalesBarConfig= {
+    labels: [] as string[],
+    datasets: [
+      {
+        label: 'Total sales',
+        data: [] as number[],
+        borderColor:'color' as string,
+        backgroundColor:'color' as string,
+        borderWidth: 1
+      }
+    ]
+  };
 categorySalesPieConfig= {
   labels: [] as string[],
   datasets: [
@@ -143,15 +136,14 @@ ngOnInit(){
       this.mostSalesCategory.sales = maxQty;
     })
     //product sales barChart
-    this.productSalesBarConfig.data.labels= mappedProducts.map(p => p.name);
+    this.productSalesBarConfig.labels= mappedProducts.map(p => p.name);
     let productSalesQty=new Array(mappedProducts.length).fill(0);
     completed.forEach(sale =>{
       productSalesQty[Number(sale.productId)-1]+=sale.quantity;
     })
-    this.productSalesBarConfig.data.datasets[0].data =productSalesQty;
-    this.productSalesBarChart=new Chart('BarChart', this.productSalesBarConfig);
-    
-    
+    this.productSalesBarConfig.datasets[0].data =productSalesQty;
+    this.productSalesBarConfig.datasets[0].backgroundColor =this.getRandomColor();
+    this.productSalesBarConfig.datasets[0].borderColor =this.getRandomColor();
   })
   
 // sales per product line chart  
@@ -213,9 +205,9 @@ openForm() {
   } 
 }
 getRandomColor(): string {
-  const hue = ((Math.random() * (0.360- 0.001) + 0.1)*360).toFixed(2); 
-  const saturation = 60; // menos saturado → pastel
-  const lightness = 70;  // más claro → pastel
+  const hue = Math.floor(Math.random() * 360); // 0–360 → todos los colores
+  const saturation = 70; // un poco más saturado
+  const lightness = 75;  // claro → pastel
   return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 }
 }

@@ -55,10 +55,10 @@ export class PieChartComponent implements OnChanges {
   }
 
 
-  getRandomColor(): string {
-  const hue = ((Math.random() * (0.360- 0.001) + 0.1)*360).toFixed(2); 
-  const saturation = 60;
-  const lightness = 70;  
+getRandomColor(): string {
+  const hue = Math.floor(Math.random() * 360); // 0–360 → todos los colores
+  const saturation = 70; // un poco más saturado
+  const lightness = 75;  // claro → pastel
   return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 }
 }

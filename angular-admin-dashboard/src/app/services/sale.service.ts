@@ -19,19 +19,26 @@ export class SaleService {
       );
     }
     
-    getAnualSales(){
-      return this.http.get<any[]>(this.apiUrl).pipe(
-        map(sales=>{
-          const monthlySales = new Array(12).fill(0);
-          sales.forEach(sale => {
-            const month = new Date(sale.date).getMonth(); 
-            monthlySales[month] += 1; 
-          });
-          return monthlySales;
+    getAnualSales() {
+  return this.http.get<any[]>(this.apiUrl).pipe(
+    map(sales => {
+      const salesByYear: Record<number, number[]> = {};
+
+      sales.forEach(sale => {
+        const date = new Date(sale.date);
+        const year = date.getFullYear();
+        const month = date.getMonth(); 
+        if (!salesByYear[year]) {
+          salesByYear[year] = new Array(12).fill(0);
         }
-      )
-    )
-  }
+        salesByYear[year][month] += sale.total;
+      });
+
+      return salesByYear;
+    })
+  );
+}
+
   getAnualProfits() {
   return this.http.get<any[]>(this.apiUrl).pipe(
     map(sales => {

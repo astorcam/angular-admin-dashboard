@@ -28,11 +28,15 @@
                 </app-pie-chart>
             </div>
             <div class="col-6">
-                <app-bar-chart [chart]="productSalesBarChart"></app-bar-chart>
+               <app-bar-chart 
+                 [labels]="productSalesBarConfig.labels"
+                [dataset]="productSalesBarConfig.datasets"
+                title="Product's Sales">
+                </app-bar-chart> 
                 <app-line-chart
                  [labels]="productSalesLineConfig.labels"
                 [dataset]="productSalesLineConfig.datasets"
-                title="Sales per categories" 
+                title="Anual sales per categories" 
                 ></app-line-chart>     
             </div>
         </div>

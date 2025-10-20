@@ -1,6 +1,4 @@
 import { Component } from '@angular/core';
-import { UserMenuComponent } from '../layout/user-menu/user-menu.component';
-import { GeneralMenuComponent } from '../layout/general-menu/general-menu.component';
 import { StatsCardComponent } from '../layout/stats-card/stats-card.component';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import { RouterModule } from '@angular/router';
@@ -8,7 +6,6 @@ import { UserService } from '../../services/user.service';
 import { ProductService } from '../../services/product.service';
 import { SaleService } from '../../services/sale.service';
 import { BarChartComponent } from '../layout/bar-chart/bar-chart.component';
-import { Chart } from 'chart.js';
 import { LineChartComponent } from "../layout/line-chart/line-chart.component";
 import { DataTableComponent } from "../layout/data-table/data-table.component";
 import { CommonModule } from '@angular/common';
@@ -28,27 +25,20 @@ export class HomeComponent {
   totalProducts=0;
   totalSales=0;
   profit=0;
-  barChart!: Chart;
-  lineChart!: Chart;
-  barConfig: any = {
-    type: 'bar',
-    data: {
-       labels: months,
-       datasets: [
-      { 
-        label: 'Sales 2025',
-        data: [],
-        backgroundColor: '#FFC154',
-        borderColor: '#0e1f2eff',
+
+  anualSalesBarConfig= {
+    labels: [] as string[],
+    datasets: [
+      {
+        label: 'Total sales',
+        data: [] as number[],
+        borderColor:'color' as string,
+        backgroundColor:'color' as string,
         borderWidth: 1
       }
     ]
-    },
-    options: {
-        responsive: true
-      }
   };
-
+  
   anualProfitLineConfig= {
   labels: [] as string[],
   datasets: [
@@ -96,9 +86,20 @@ ngOnInit(){
   this.salesTableConfig.dataSource=s.reverse();
     } 
   )
-this.saleService.getAnualSales().subscribe(monthlySales => {
-  this.barConfig.data.datasets[0].data = monthlySales;
-  this.barChart = new Chart('BarChart', this.barConfig);
+this.saleService.getAnualSales().subscribe(salesByYear => {
+
+  const datasets = Object.keys(salesByYear).map(year => ({
+    label: `Sales ${year}`,
+    data: salesByYear[+year],
+    borderColor: this.getRandomColor(),
+    backgroundColor:this.getRandomColor(),
+    borderWidth:1
+    }))
+    this.anualSalesBarConfig = {
+    labels: months,
+    datasets: datasets 
+  };
+
 });
   this.saleService.getAnualProfits().subscribe(profitsByYear => {
 
@@ -152,9 +153,9 @@ openForm() {
   } 
 }
 getRandomColor(): string {
-  const hue = ((Math.random() * (0.360- 0.001) + 0.1)*360).toFixed(2); 
-  const saturation = 60; // menos saturado → pastel
-  const lightness = 70;  // más claro → pastel
+  const hue = Math.floor(Math.random() * 360); // 0–360 → todos los colores
+  const saturation = 70; // un poco más saturado
+  const lightness = 75;  // claro → pastel
   return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 }
 }

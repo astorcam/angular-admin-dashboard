@@ -10,7 +10,11 @@
         </div> 
           <div class="row">
             <div class="col-6">
-                <app-bar-chart [chart]="barChart"></app-bar-chart>   
+                <app-bar-chart 
+                [labels]="anualSalesBarConfig.labels"
+                [dataset]="anualSalesBarConfig.datasets"
+                title="Anual Sales">
+              </app-bar-chart>   
             </div>
             <div class="col-6">
               <app-line-chart 

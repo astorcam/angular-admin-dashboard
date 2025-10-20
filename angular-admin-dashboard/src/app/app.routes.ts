@@ -4,6 +4,7 @@ import { ProductListComponent } from './products/product-list/product-list.compo
 import { UserListComponent } from './users/user-list/user-list.component';
 import { NgModule } from '@angular/core';
 import { DashboardLayoutComponent } from './layout/dashboard-layout/dashboard-layout.component';
+import { SettingsComponent } from './setting-layout/settings/settings.component';
 
 export const routes: Routes = [
    {
@@ -13,6 +14,7 @@ export const routes: Routes = [
       { path: 'dashboard', component: HomeComponent },
       { path: 'products', component: ProductListComponent },
       { path: 'users', component: UserListComponent },
+      { path: 'settings', component: SettingsComponent },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ]
   },

@@ -1,0 +1,41 @@
+
+  <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="settings-form">
+    
+    <div class="form-group">
+      <label for="name">Full Name</label>
+      <input id="name" type="text" formControlName="name" placeholder="Enter your full name" />
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input id="email" type="email" formControlName="email" placeholder="you@email.com" />
+    </div>
+
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input id="password" type="password" formControlName="password" placeholder="New password" />
+    </div>
+
+    <div class="form-group">
+      <label for="age">Age</label>
+      <input id="age" type="number" formControlName="age" min="0" placeholder="Enter your age" />
+    </div>
+
+    <div class="form-group">
+      <label for="country">Nationality</label>
+      <select id="country" formControlName="country">
+        <option value="">Select your country</option>
+        <option *ngFor="let country of countries" [value]="country">{{ country }}</option>
+      </select>
+    </div>
+
+    <div class="form-group avatar-upload">
+      <label for="avatar">Avatar</label>
+      <input id="avatar" type="file" (change)="onAvatarChange($event)" accept="image/*" />
+      <div class="avatar-preview" *ngIf="avatarPreview">
+        <img [src]="avatarPreview" alt="Avatar preview" />
+      </div>
+    </div>
+
+    <button type="submit" class="submit-button" [disabled]="profileForm.invalid">Save Changes</button>
+  </form>
