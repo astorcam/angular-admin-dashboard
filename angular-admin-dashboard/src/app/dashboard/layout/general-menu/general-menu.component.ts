@@ -5,6 +5,8 @@ import {MatToolbarModule} from '@angular/material/toolbar';
 import { MatFormFieldModule } from '@angular/material/form-field'; 
 import { MatInputModule } from '@angular/material/input';
 import {MatButtonModule} from '@angular/material/button';
+import { AuthService } from '../../../services/auth.service';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -14,5 +16,12 @@ import {MatButtonModule} from '@angular/material/button';
   styleUrl: './general-menu.component.scss'
 })
 export class GeneralMenuComponent {
-
+ constructor(private authService:AuthService, 
+  private router: Router
+){}
+onSignOut()
+{
+  this.authService.signOut();
+  this.router.navigate(["/login"]);
+}
 }

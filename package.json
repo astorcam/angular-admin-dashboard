@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "ngx-webstorage": "^20.0.0"
+  }
+}

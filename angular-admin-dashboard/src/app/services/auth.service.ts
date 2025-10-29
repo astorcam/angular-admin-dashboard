@@ -1,12 +1,15 @@
-import { createClient, SupabaseClient, AuthResponse, User } from '@supabase/supabase-js';
+import { createClient, SupabaseClient,User, Session } from '@supabase/supabase-js';
 import { environment } from '../../enviroments/enviroment';
 import { from, Observable, switchMap } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
+import { LocalStorage } from 'ngx-webstorage';
+
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private supabase!: SupabaseClient;
+  @LocalStorage('sb-session') session: Session | null = null;
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {
     if (isPlatformBrowser(this.platformId)) {
@@ -52,12 +55,15 @@ export class AuthService {
     });
 
     if (error) throw error;
+      // Guarda la sesión en localStorage (opcional, para tenerlo accesible)
+    this.session = data.session;
     return data;
   }
 
   // 🔹 Cierre de sesión
   signOut(): Observable<void> {
-    return from(this.supabase.auth.signOut().then(() => {}));
+    return from(this.supabase.auth.signOut().then(() => {this.session = null;
+}));
   }
 
   // 🔹 Obtener usuario actual
@@ -68,8 +74,27 @@ export class AuthService {
   }
 
   // 🔹 Comprobar si hay sesión activa (sin Observable)
-  async isLoggedIn(): Promise<boolean> {
-    const { data } = await this.supabase.auth.getSession();
-    return !!data.session;
+  isLoggedIn(): boolean {
+    return !!this.session; 
+  }
+
+  async restoreSession() {
+    // Intenta recuperar la sesión activa desde Supabase
+    if(this.supabase){
+      const {
+        data: { session },
+      } = await this.supabase.auth.getSession();
+  
+      if (session) {
+        this.session = session; // ✅ restaura sesión en memoria y localStorage
+      } else {
+        this.session = null;
+      }
+
+    }
+  }
+
+  getSession() {
+    return this.session; 
   }
 }
