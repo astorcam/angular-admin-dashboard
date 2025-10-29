@@ -2,7 +2,7 @@ $sidenav-color:#173753;
 
 
 .mat-sidenav-container{
-    background-color: $sidenav-color;
+    background: radial-gradient(circle at top left, #173753, #1c1c1d 70%);
     height: 100%!important;
     width: 100%!important;
 }
