@@ -95,12 +95,11 @@
                   </select>
 
                   <label for="country">Country</label>
-                  <input
-                    type="text"
-                    id="country"
-                    formControlName="country"
-                    placeholder="Enter your country"
-                  />
+                  <select id="country" formControlName="country">
+                    <option value="" disabled selected>Select your country</option>
+                    <option *ngFor="let country of countries" [value]="country">{{ country }}</option>
+                  </select>
+                
         <button type="submit" class="login-button">Sign Up</button>
       </form>
       </div>

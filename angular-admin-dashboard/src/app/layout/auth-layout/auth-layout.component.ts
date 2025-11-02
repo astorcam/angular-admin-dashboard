@@ -5,16 +5,29 @@ import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { NgIf } from '@angular/common'; 
 import { firstValueFrom } from 'rxjs';
-
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-auth-layout',
-  imports: [ReactiveFormsModule, NgIf],
+  imports: [ReactiveFormsModule, NgIf, CommonModule],
   templateUrl: './auth-layout.component.html',
   styleUrl: './auth-layout.component.scss'
 })
 export class AuthLayoutComponent {
-
+ countries = [
+    'Spain',
+    'France',
+    'Germany',
+    'Italy',
+    'United Kingdom',
+    'United States',
+    'Argentina',
+    'Brazil',
+    'Mexico',
+    'Canada',
+    'Australia',
+    'Japan'
+  ];
 
   loginForm: FormGroup;
   isLogin: boolean=true;

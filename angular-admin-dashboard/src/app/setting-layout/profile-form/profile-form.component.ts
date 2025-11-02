@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
+
 
 @Component({
   selector: 'app-profile-form',
@@ -10,46 +12,57 @@ import { CommonModule } from '@angular/common';
   styleUrl: './profile-form.component.scss'
 })
 export class ProfileFormComponent {
-  profileForm: FormGroup;
-  avatarPreview: string | ArrayBuffer | null = null;
+  countries = [
+    'Spain',
+    'France',
+    'Germany',
+    'Italy',
+    'United Kingdom',
+    'United States',
+    'Argentina',
+    'Brazil',
+    'Mexico',
+    'Canada',
+    'Australia',
+    'Japan'
+  ];
+  profileForm!: FormGroup;
+  fullName!: string;
+  email!: string|undefined;
+  age!: string;
+  country!: string;
+  
 
-countries = [
-  'Spain',
-  'France',
-  'Germany',
-  'Italy',
-  'United Kingdom',
-  'United States',
-  'Argentina',
-  'Brazil',
-  'Mexico',
-  'Canada',
-  'Australia',
-  'Japan'
-];
-  constructor(private fb: FormBuilder) {
+
+  constructor(private fb: FormBuilder,
+    private authService:AuthService
+  ) {
     this.profileForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
-      email: ['', [Validators.required, Validators.email]],
+      email: [{ value: '', disabled: true }],
       password: ['', [Validators.minLength(6)]],
-      age: [null, [Validators.min(0)]],
+      confirmPassword: [''],
       country: [''],
       avatar: [null]
+    },
+     { validators: this.passwordMatchValidator }
+  );
+  }
+
+ngOnInit(){
+   this.authService.getUserProfile().subscribe((profile) => {
+      if (profile) {
+        this.fullName = profile.name; 
+        this.country = profile.country; 
+      }
     });
-  }
+   this.authService.getUser().subscribe((user) => {
+      if (user) {
+        this.email = user.email; 
+      }
+    });
 
-  onAvatarChange(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files[0]) {
-      const file = input.files[0];
-      this.profileForm.patchValue({ avatar: file });
-
-      const reader = new FileReader();
-      reader.onload = () => this.avatarPreview = reader.result;
-      reader.readAsDataURL(file);
-    }
-  }
-
+}
   onSubmit(): void {
     if (this.profileForm.valid) {
       console.log('Profile data:', this.profileForm.value);
@@ -58,4 +71,10 @@ countries = [
       alert('⚠️ Please fill all required fields correctly.');
     }
   }
+
+  passwordMatchValidator(form: FormGroup) {
+  const password = form.get('password')?.value;
+  const confirmPassword = form.get('confirmPassword')?.value;
+  return password === confirmPassword ? null : { passwordMismatch: true };
+}
 }

@@ -1,9 +1,10 @@
 import { createClient, SupabaseClient,User, Session } from '@supabase/supabase-js';
 import { environment } from '../../enviroments/enviroment';
-import { from, Observable, switchMap } from 'rxjs';
+import { from, map, Observable, switchMap } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { LocalStorage } from 'ngx-webstorage';
+
 
 
 @Injectable({ providedIn: 'root' })
@@ -25,7 +26,7 @@ export class AuthService {
 
         const user = data.user;
         if (!user) throw new Error('No se pudo crear el usuario');
-
+        const avatarUrl='https://api.dicebear.com/9.x/dylan/png?seed=${'+user.email+'}';
         // 🔸 Insertar datos adicionales en tabla 'users'
         const { error: insertError } = await this.supabase
           .from('users_info')
@@ -35,7 +36,7 @@ export class AuthService {
               name: extraData.name,
               role: extraData.role || 'User',
               country: extraData.country || null,
-              avatar: extraData.avatar || null,
+              avatar: avatarUrl || null,
               created_at: new Date(),
             },
           ]);
@@ -70,6 +71,20 @@ export class AuthService {
   getUser(): Observable<User | null> {
     return from(
       this.supabase.auth.getUser().then(({ data }) => data?.user ?? null)
+    );
+  }
+  getUserProfile(): Observable<any> {
+    return this.getUser().pipe(
+      switchMap((user) => {
+        if (!user) return from([null]); // Si no hay usuario logueado
+        return from(
+          this.supabase
+            .from('users_info')
+            .select('*')
+            .eq('id', user.id) // asumiendo que la columna 'id' coincide con user.id
+            .single()
+        ).pipe(map(({ data }) => data));
+      })
     );
   }
 

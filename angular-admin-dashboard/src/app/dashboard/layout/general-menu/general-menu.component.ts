@@ -19,6 +19,18 @@ export class GeneralMenuComponent {
  constructor(private authService:AuthService, 
   private router: Router
 ){}
+fullName!:string;
+avatarUrl!:string;
+
+ngOnInit(){
+   this.authService.getUserProfile().subscribe((profile) => {
+      if (profile) {
+        this.fullName = profile.name; 
+        this.avatarUrl=profile.avatar;
+      }
+    });
+}
+
 onSignOut()
 {
   this.authService.signOut();
