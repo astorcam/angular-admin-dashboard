@@ -63,8 +63,11 @@ ngOnInit(){
     this.usersSuspended = users.filter(u => u.status === "Suspended").length;
     this.activeUsers = users.filter(u => u.lastLogin===today).length;
     this.newUsers = users.filter(u => {
-      const [year, month] = u.createdAt.split("-");
-      return year === yyyy.toString() && month === mm;
+      const date = new Date(u.created_at);
+      const year = date.getFullYear();
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+
+      return year === yyyy && month === mm;
     }).length;
     //user table config
     const keys = Object.keys(users[0]);

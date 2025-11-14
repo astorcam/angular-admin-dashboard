@@ -78,91 +78,73 @@ ngOnInit(){
   ).subscribe(mProducts=> mappedProducts=mProducts)
   //best seller
   this.salesService.getBestSeller().subscribe(i=>{
-    this.bestSeller.sales=i.totalSold;
-    if (i.productId !== null){
-      this.productService.getProductById(i.productId).subscribe(p=>this.bestSeller.name=p.name)
+    if(i){
+      this.bestSeller.sales=i.totalSold;
+      if (i.productId !== null){
+        this.productService.getProductById(i.productId).subscribe(p=>this.bestSeller.name=p.name)
+      }
     }
   })
   
   //worst seller
   this.salesService.getWorstSeller().subscribe(i=>{
-    this.worstSeller.sales=i.totalSold;
-    if (i.productId !== null){
-      this.productService.getProductById(i.productId).subscribe(p=>this.worstSeller.name=p.name)
+    if(i){
+      this.worstSeller.sales=i.totalSold;
+      if (i.productId !== null){
+        this.productService.getProductById(i.productId).subscribe(p=>this.worstSeller.name=p.name)
+      }
     }
   })
   
   //most sales category
-  this.salesService.getSales().subscribe(s=>{
-    const completed = s.filter(s => s.status === 'Completed');
-    const productSales: { [key: number]: number } = {}; 
-    completed.forEach(sale => {
-      if (!productSales[sale.productId]) {
-        productSales[sale.productId] = 0;
-      }
-      productSales[sale.productId] += sale.quantity;
-    })
-    
-    const requests = Object.keys(productSales).map(id =>
-      this.productService.getProductById(Number(id)).pipe(
-        map(product => ({ category: product.category, qty: productSales[Number(id)] }))
-      )
-    );
-    
-    forkJoin(requests).subscribe(results => {
-      const salesCategories: { [key: string]: number } = {}; 
-      results.forEach(r => {
-        salesCategories[r.category] = (salesCategories[r.category] || 0) + r.qty;
-      });
+  this.salesService.getMostSalesCategory().subscribe(result => {
+  this.mostSalesCategory = {
+    category: result.category,
+    sales: result.totalSales
+  };
+});
+this.salesService.getProductSalesBarChartData().subscribe(chart => {
+  this.productSalesBarConfig.labels = chart.labels;
+  this.productSalesBarConfig.datasets[0].data = chart.data;
+  this.productSalesBarConfig.datasets[0].backgroundColor = this.getRandomColor();
+  this.productSalesBarConfig.datasets[0].borderColor = this.getRandomColor();
+});
+// sales per product line chart  
+this.salesService.getAnualSalesPerProduct().subscribe(productSales => {
+  if(productSales){
+    const datasets = Object.keys(productSales).map(key => {
+      const product = mappedProducts.find(p => p.id == +key);
+      return {
+        label: product?.name ,
+        data: productSales[+key],
+        borderColor: this.getRandomColor(),
+      };
+    });  
+    this.productSalesLineConfig = {
+      labels: months,
+      datasets: datasets 
+    };
+  }
+})
+//pie chart data
+
+this.salesService.getSalesByCategory()
+  .pipe(
+    map(salesCategories => {
+      const sC = salesCategories as { [key: string]: number };
+
       this.categorySalesPieConfig = {
-        labels: Object.keys(salesCategories),
+        labels: Object.keys(sC),
         datasets: [
           {
             label: "Total sales",
-            data: Object.values(salesCategories)
+            data: Object.values(sC)
           }
         ]
       };
-      
-      let mostSalesCategory="";
-      let maxQty = 0;
-      for (const category in salesCategories) {
-        if (salesCategories[category] > maxQty) {
-          maxQty= salesCategories[category]
-          mostSalesCategory=category
-        }
-      }
-      this.mostSalesCategory.category = mostSalesCategory;
-      this.mostSalesCategory.sales = maxQty;
     })
-    //product sales barChart
-    this.productSalesBarConfig.labels= mappedProducts.map(p => p.name);
-    let productSalesQty=new Array(mappedProducts.length).fill(0);
-    completed.forEach(sale =>{
-      productSalesQty[Number(sale.productId)-1]+=sale.quantity;
-    })
-    this.productSalesBarConfig.datasets[0].data =productSalesQty;
-    this.productSalesBarConfig.datasets[0].backgroundColor =this.getRandomColor();
-    this.productSalesBarConfig.datasets[0].borderColor =this.getRandomColor();
-  })
-  
-// sales per product line chart  
-this.salesService.getAnualSalesPerProduct().subscribe(productSales => {
-  const datasets = Object.keys(productSales).map(key => {
-    const product = mappedProducts.find(p => p.id == +key);
-    return {
-      label: product?.name ,
-      data: productSales[+key],
-      borderColor: this.getRandomColor(),
-    };
-  });
-
-  this.productSalesLineConfig = {
-    labels: months,
-    datasets: datasets 
-  };
-});
-
+  )
+  .subscribe();
   
   this.productService.getProducts().subscribe(p =>{
     //lowest stock

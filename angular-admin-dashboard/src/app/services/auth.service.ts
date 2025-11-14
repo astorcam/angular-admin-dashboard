@@ -1,22 +1,19 @@
-import { createClient, SupabaseClient,User, Session } from '@supabase/supabase-js';
-import { environment } from '../../enviroments/enviroment';
+import { SupabaseClient,User, Session } from '@supabase/supabase-js';
 import { from, map, Observable, switchMap } from 'rxjs';
-import { isPlatformBrowser } from '@angular/common';
-import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { LocalStorage } from 'ngx-webstorage';
+import { SupabaseService } from './supabase.service';
 
 
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private supabase!: SupabaseClient;
+  private supabase: SupabaseClient;
   @LocalStorage('sb-session') session: Session | null = null;
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
-    if (isPlatformBrowser(this.platformId)) {
-      this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
-    }
-  }
+constructor(private supabaseService: SupabaseService) {
+  this.supabase = this.supabaseService.client;
+}
 
   // 🔹 Registro de usuario
     signUp(email: string, password: string, extraData: any): Observable<any> {

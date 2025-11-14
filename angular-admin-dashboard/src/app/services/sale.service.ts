@@ -1,37 +1,57 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { map, Observable } from 'rxjs';
+import { forkJoin, from, map, Observable, switchMap } from 'rxjs';
+import { SupabaseClient } from '@supabase/supabase-js';
+import { SupabaseService } from './supabase.service';
+import { ProductService } from './product.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SaleService {
   private apiUrl = 'http://localhost:3000/sales';
-  
-  constructor(private http: HttpClient) { }
+  supabase: SupabaseClient;
+ 
+  constructor(private http: HttpClient, private supabaseService: SupabaseService,private productService: ProductService) { 
+    this.supabase = this.supabaseService.client;
+  }
   
   getSales(){
-    return this.http.get<any[]>(this.apiUrl);}
-    
-    getProfit(): Observable<number> {
-      return this.http.get<any[]>(this.apiUrl).pipe(
-        map(sales => sales.reduce((acc, s) => acc + s.total, 0))
-      );
+        return from(this.supabase.from('sales').select('*').then(({ data }) => data ?? []));  
     }
     
-    getAnualSales() {
-  return this.http.get<any[]>(this.apiUrl).pipe(
-    map(sales => {
-      const salesByYear: Record<number, number[]> = {};
+ getProfit(): Observable<number> {
+  return from(this.supabase.from('sales').select('total')).pipe(
+    map(({ data, error }) => {
+      if (error) {
+        console.error('Error fetching sales:', error);
+        return 0;
+      }
+      if (!data || data.length === 0) return 0;
+      return data.reduce((acc: number, s: any) => acc + (s.total || 0), 0);
+    })
+  );
+}
+    
+getAnualSales(): Observable<Record<number, number[]>> {
+  return from(
+    this.supabase.from('sales').select('date,quantity')
+  ).pipe(
+    map(({ data, error }) => {
+      if (error) throw error;
+      if (!data) return {};
 
-      sales.forEach(sale => {
+      const salesByYear: Record<number, number[]> = {};
+      data.forEach(sale => {
         const date = new Date(sale.date);
         const year = date.getFullYear();
-        const month = date.getMonth(); 
+        const month = date.getMonth();
+
         if (!salesByYear[year]) {
           salesByYear[year] = new Array(12).fill(0);
         }
-        salesByYear[year][month] += sale.total;
+
+        salesByYear[year][month] += sale.quantity;
       });
 
       return salesByYear;
@@ -39,12 +59,17 @@ export class SaleService {
   );
 }
 
-  getAnualProfits() {
-  return this.http.get<any[]>(this.apiUrl).pipe(
-    map(sales => {
+getAnualProfits(): Observable<Record<number, number[]>> {
+  return from(
+    this.supabase.from('sales').select('date,total')
+  ).pipe(
+    map(({ data, error }) => {
+      if (error) throw error;
+      if (!data) return {};
+
       const profitsByYear: Record<number, number[]> = {};
 
-      sales.forEach(sale => {
+      data.forEach(sale => {
         const date = new Date(sale.date);
         const year = date.getFullYear();
         const month = date.getMonth();
@@ -60,79 +85,139 @@ export class SaleService {
     })
   );
 }
+
 getBestSeller() {
-  return this.http.get<any[]>(this.apiUrl).pipe(
-    map(sales=>{
-      const completed = sales.filter(s => s.status === 'Completed');
-      const hashTotals: { [key: number]: number } = {}; 
+  return from(
+    this.supabase
+      .from('sales')
+      .select('*')
+  ).pipe(
+    map(({ data, error }) => {
+      if (error) {
+        console.error('Error fetching sales:', error);
+        return null;
+      }
+      if (!data || data.length === 0) return null;
+
+      // Filtramos solo ventas completadas
+      const completed = data.filter(s => s.status === 'Completed');
+
+      // Agrupamos por producto
+      const hashTotals: Record<number, number> = {};
       completed.forEach(sale => {
-        if (!hashTotals[sale.productId]) {
-          hashTotals[sale.productId] = 0;
-        }
-        hashTotals[sale.productId] += sale.quantity;
+        const pid = sale.product_id; // 👈 usa el nombre real de la columna
+        hashTotals[pid] = (hashTotals[pid] || 0) + sale.quantity;
       });
+
+      // Buscamos el más vendido
       let bestSellerId: number | null = null;
       let maxQty = 0;
-      
       for (const productId in hashTotals) {
         if (hashTotals[productId] > maxQty) {
           maxQty = hashTotals[productId];
           bestSellerId = +productId;
         }
       }
+
       return { productId: bestSellerId, totalSold: maxQty };
-    }))
-  }
-  getWorstSeller() {
-    return this.http.get<any[]>(this.apiUrl).pipe(
-      map(sales=>{
-      const completed = sales.filter(s => s.status === 'Completed');
-      const hashTotals: { [key: number]: number } = {}; 
+    })
+  );
+}
+ getWorstSeller() {
+  return from(
+    this.supabase
+      .from('sales')
+      .select('*')
+  ).pipe(
+    map(({ data, error }) => {
+      if (error) {
+        console.error('Error fetching sales:', error);
+        return null;
+      }
+      if (!data || data.length === 0) return null;
+
+      // Filtramos solo ventas completadas
+      const completed = data.filter(s => s.status === 'Completed');
+      if (completed.length === 0) return null;
+
+      // Agrupamos por producto
+      const hashTotals: Record<number, number> = {};
       completed.forEach(sale => {
-        if (!hashTotals[sale.productId]) {
-          hashTotals[sale.productId] = 0;
-        }
-        hashTotals[sale.productId] += sale.quantity;
+        const pid = sale.product_id; 
+        hashTotals[pid] = (hashTotals[pid] || 0) + sale.quantity;
       });
+
+      // Encontramos el producto con menor cantidad vendida
       let worstSellerId: number | null = null;
-      let maxQty =Object.values(hashTotals)[0];
-      
+      let minQty = Infinity;
+
       for (const productId in hashTotals) {
-        if (hashTotals[productId] < maxQty) {
-          maxQty = hashTotals[productId];
+        const qty = hashTotals[productId];
+        if (qty < minQty) {
+          minQty = qty;
           worstSellerId = +productId;
         }
       }
-      return { productId: worstSellerId, totalSold: maxQty };
-    }))
-  }
+
+      if (worstSellerId === null) return null;
+      return { productId: worstSellerId, totalSold: minQty };
+    })
+  );
+}
+
   getAnualSalesPerProduct() {
-    return this.http.get<any[]>(this.apiUrl).pipe(
-      map(sales=>{
-        const productsSales:{ [key: number]: Array<number> } = {}; 
-        
-        sales.forEach(sale => {
-          if (!productsSales[sale.productId]) {
-            productsSales[sale.productId] =new Array(12).fill(0);
-          }
-          const month = new Date(sale.date).getMonth();
-          productsSales[sale.productId][month] = sale.total;
-          });
-           
-        return productsSales;
+  return from(
+    this.supabase.from('sales').select('*')
+  ).pipe(
+    map(({ data, error }) => {
+      if (error) {
+        console.error('Error fetching sales:', error);
+        return null;
       }
-    )
-  )
-  }
+      if (!data || data.length === 0) return null;
+
+      // Filtramos solo ventas completadas
+      const completed = data.filter(s => s.status === 'Completed');
+      if (completed.length === 0) return null;
+
+      const productsSales: { [key: number]: number[] } = {}; 
+
+      completed.forEach(sale => {
+        const productId = sale.product_id; 
+        const month = new Date(sale.date).getMonth(); 
+
+        if (!productsSales[productId]) {
+          productsSales[productId] = new Array(12).fill(0);
+        }
+
+        productsSales[productId][month] += sale.total; 
+      });
+
+      return productsSales;
+    })
+  );
+}
+
 
   getTopProductsOfYear() {
-  return this.http.get<any[]>(this.apiUrl).pipe(
-    map(sales => {
+  return from(
+    this.supabase
+      .from('sales')
+      .select('*')
+  ).pipe(
+    map(({ data, error }) => {
+      if (error) {
+        console.error('Error fetching sales:', error);
+        return [];
+      }
+      if (!data) return [];
+
       const totalsByProduct: Record<number, number> = {};
 
-      sales.forEach(sale => {
+      data.forEach(sale => {
         // Sumamos la cantidad total por producto en el año
-        totalsByProduct[sale.productId] = (totalsByProduct[sale.productId] || 0) + sale.quantity;
+        totalsByProduct[sale.product_id] =
+          (totalsByProduct[sale.product_id] || 0) + sale.quantity;
       });
 
       // Convertimos a array y ordenamos
@@ -145,5 +230,107 @@ getBestSeller() {
     })
   );
 }
+getMostSalesCategory(): Observable<{ category: string, totalSales: number }> {
+  return from(this.supabase.from('sales').select('*')).pipe(
+    map(({ data, error }) => {
+      if (error) throw error;
+      if (!data) return { category: '', totalSales: 0 };
+
+      const completed = data.filter(s => s.status === 'Completed');
+      const productSales: Record<number, number> = {};
+
+      completed.forEach(s => {
+        productSales[s.product_id] = (productSales[s.product_id] || 0) + s.quantity;
+      });
+
+      return productSales;
+    }),
+    switchMap(productSales  => {
+      const ps = productSales as Record<number, number>;
+      const requests = Object.keys(productSales).map(id =>
+        this.productService.getProductById(Number(id)).pipe(
+          map(product => ({ category: product.category, qty: ps[Number(id)] }))
+        )
+      );
+      return forkJoin(requests);
+    }),
+    map(results => {
+      const salesCategories: Record<string, number> = {};
+      results.forEach(r => {
+        salesCategories[r.category] = (salesCategories[r.category] || 0) + r.qty;
+      });
+
+      let mostCategory = '';
+      let maxQty = 0;
+      for (const category in salesCategories) {
+        if (salesCategories[category] > maxQty) {
+          mostCategory = category;
+          maxQty = salesCategories[category];
+        }
+      }
+      return { category: mostCategory, totalSales: maxQty };
+    })
+  );
+}
+
+getProductSalesBarChartData(): Observable<{ labels: string[], data: number[] }> {
+  return from(this.supabase.from('sales').select('*')).pipe(
+    map(({ data, error }) => {
+      if (error) throw error;
+      const completed = data?.filter(s => s.status === 'Completed') ?? [];
+      const productSales: Record<number, number> = {};
+      completed.forEach(sale => {
+        productSales[sale.product_id] = (productSales[sale.product_id] || 0) + sale.quantity;
+      });
+      return productSales;
+    }),
+    switchMap(productSales => {
+      const requests = Object.keys(productSales).map(id =>
+        this.productService.getProductById(Number(id)).pipe(
+          map(product => ({
+            name: product.name,
+            qty: productSales[Number(id)]
+          }))
+        )
+      );
+      return forkJoin(requests);
+    }),
+    map(mappedProducts => ({
+      labels: mappedProducts.map(p => p.name),
+      data: mappedProducts.map(p => p.qty)
+    }))
+  );
+}
+
+ getSalesByCategory(): Observable<{ [category: string]: number }> {
+  return this.getSales().pipe(
+    switchMap(sales => {
+      const completed = sales.filter(s => s.status === 'Completed');
+      const productSales: { [key: number]: number } = {};
+
+      completed.forEach(sale => {
+        if (!productSales[sale.product_id]) productSales[sale.product_id] = 0;
+        productSales[sale.product_id] += sale.quantity;
+      });
+
+      const requests = Object.keys(productSales).map(id =>
+        this.productService.getProductById(Number(id)).pipe(
+          map(product => ({ category: product.category, qty: productSales[Number(id)] }))
+        )
+      );
+      return forkJoin(requests).pipe(
+        map(results => {
+          const salesCategories: { [key: string]: number } = {};
+          results.forEach(r => {
+            salesCategories[r.category] = (salesCategories[r.category] || 0) + r.qty;
+          });
+          return salesCategories;
+        })
+      );
+    })
+  );
+}
+
+
 }
 
