@@ -10,6 +10,7 @@ import { PieChartComponent } from "../../dashboard/layout/pie-chart/pie-chart.co
 import { LineChartComponent } from "../../dashboard/layout/line-chart/line-chart.component";
 import { ProductFormComponent } from "../product-form/product-form.component";
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
 
 const months=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 @Component({
@@ -62,7 +63,8 @@ productSalesLineConfig= {
 showProductForm: boolean=false;
 
 constructor(private productService: ProductService,
-  private salesService: SaleService
+  private salesService: SaleService,
+  private authService: AuthService
 ){}
 
 ngOnInit(){
@@ -173,9 +175,21 @@ this.salesService.getSalesByCategory()
 
 
 onProductAdded(product: any) {
-  console.log('Producto agregado:', product);
-  this.showProductForm = false;
+  this.authService.getUser().subscribe(user => {
+    if (!user) return;
+
+    this.productService.addProduct(product, user.id).subscribe({
+      next: () => {
+        this.showProductForm = false;
+        this.productService.getProducts().subscribe(p => {
+          this.productTableConfig.dataSource = p;
+        });
+      },
+      error: err => console.error('Error al agregar producto:', err)
+    });
+  });
 }
+
 onProductCanceled() {
  console.log('Producto cancelado');
   this.showProductForm = false;

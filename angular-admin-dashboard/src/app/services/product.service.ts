@@ -36,4 +36,10 @@ export class ProductService {
       })
     );
   }
+  addProduct(product: any, userId: string) {
+    const { id, ...cleanProduct } = product;
+    console.log('Producto agregado:', cleanProduct, userId);
+  return from(this.supabase.from('products').insert([{ ...cleanProduct, user_id: userId }]));
+}
+
 }
