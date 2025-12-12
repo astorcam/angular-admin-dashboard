@@ -19,23 +19,19 @@ export class UserFormComponent {
     this.userForm = this.fb.group({
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      role: ['User', Validators.required],
-      status: ['Active', Validators.required],
       country: ['', Validators.required],
-      avatar: ['https://i.pravatar.cc/150?img=1'],
-      products: [0, [Validators.min(0)]],
+      avatar: ['https://api.dicebear.com/9.x/dylan/png?seed=default'],
       purchases: [0, [Validators.min(0)]],
-      createdAt: [new Date().toISOString().split('T')[0]],
-      lastLogin: [new Date().toISOString().split('T')[0]]
+      created_at: [new Date().toISOString().split('T')[0]],
     });
   }
 
   onSubmit() {
     if (this.userForm.valid) {
       const newUser = {
-        id: Date.now(),
-        ...this.userForm.value
+        ...this.userForm.value,
       };
+      newUser.avatar='https://api.dicebear.com/9.x/dylan/png?seed='+newUser.email
       this.userAdded.emit(newUser);
       this.userForm.reset();
     }

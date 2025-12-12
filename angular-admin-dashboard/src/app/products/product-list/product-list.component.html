@@ -8,8 +8,11 @@
            <app-stats-card statsTitle="Worst Seller" statsIcon="thumb_down" [statsText]="worstSeller.name" [statsValue]="worstSeller.sales"></app-stats-card>
            <app-stats-card statsTitle="Lowest Stock" statsIcon="warning" [statsText]="lowStock.name" [statsValue]="lowStock.stock"></app-stats-card>
         </div> 
-    <app-product-form *ngIf="showProductForm" (productAdded)="onProductAdded($event)" (productCanceled)="onProductCanceled()"></app-product-form>
-    <app-data-table
+    <app-product-form *ngIf="showProductForm" (productAdded)="onProductAdded($event)" (productCanceled)="onProductCanceled()" ></app-product-form>
+    <app-product-edit-form *ngIf="showEditProductForm" (productEdited)="onProductEdited($event)" (productCanceled)="onProductCanceled()" 
+    [name]="editingProductFields.name" [category]="editingProductFields.category" [price]="editingProductFields.price" [stock]="editingProductFields.stock" [id]="editingProductFields.id"></app-product-edit-form>
+    
+    <app-data-table (deleteClicked)="onProductDeleted($event)" (editClicked)="onEditProduct($event)"
         [title]="''"
         [type]="'products'"
         (addClicked)="openForm()" 

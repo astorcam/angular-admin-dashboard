@@ -7,18 +7,25 @@ import { MatInputModule } from '@angular/material/input';
 import {MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
 import {MatSort, MatSortModule} from '@angular/material/sort';
 import {MatButtonModule} from '@angular/material/button';
+import { MatMenuTrigger } from '@angular/material/menu';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatIconModule } from '@angular/material/icon';
+
 
 
 
 
 @Component({
   selector: 'app-data-table',
-  imports: [MatTableModule , CommonModule, MatFormFieldModule, MatInputModule, MatTableModule, MatSortModule, MatPaginatorModule, MatButtonModule],
+  imports: [MatTableModule , CommonModule, MatFormFieldModule, MatInputModule, MatTableModule, MatSortModule, MatPaginatorModule, MatButtonModule, MatMenuTrigger, MatMenuModule, MatIconModule],
   templateUrl: './data-table.component.html',
   styleUrl: './data-table.component.scss'
 })
 
 export class DataTableComponent {
+  @Output() editClicked = new EventEmitter<any>();
+  @Output() deleteClicked = new EventEmitter<any>();
+
   @Input() type!: 'products' | 'users' |'sales';
   @Input() title!: string;
   @Output() addClicked = new EventEmitter<void>();
@@ -42,24 +49,32 @@ export class DataTableComponent {
   ngOnChanges() {
     this.labelMap = this.displayedColumns.reduce((acc, col) => {
       acc[col.key] = col.label;
-    return acc;
-  }, {} as Record<string, string>);
-}   
-
-ngAfterViewInit() {
-  this.tableDataSource.paginator = this.paginator;
-  this.tableDataSource.sort = this.sort;
-}
-
-applyFilter(event: Event) {
-  const filterValue = (event.target as HTMLInputElement).value;
-  this.tableDataSource.filter = filterValue.trim().toLowerCase();
+      return acc;
+    }, {} as Record<string, string>);
+  }   
   
-  if (this.tableDataSource.paginator) {
-    this.tableDataSource.paginator.firstPage();
+  ngAfterViewInit() {
+    this.tableDataSource.paginator = this.paginator;
+    this.tableDataSource.sort = this.sort;
   }
+  
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.tableDataSource.filter = filterValue.trim().toLowerCase();
+    
+    if (this.tableDataSource.paginator) {
+      this.tableDataSource.paginator.firstPage();
+    }
 }
 onAdd() {
-this.addClicked.emit();}
+  this.addClicked.emit();}
+
+onEdit(row: any) {
+  this.editClicked.emit(row);
+}
+
+onDelete(id: number | string) {
+  this.deleteClicked.emit(id);
+}
 }
 

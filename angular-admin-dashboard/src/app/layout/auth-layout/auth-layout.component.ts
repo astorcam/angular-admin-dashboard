@@ -14,20 +14,6 @@ import { CommonModule } from '@angular/common';
   styleUrl: './auth-layout.component.scss'
 })
 export class AuthLayoutComponent {
- countries = [
-    'Spain',
-    'France',
-    'Germany',
-    'Italy',
-    'United Kingdom',
-    'United States',
-    'Argentina',
-    'Brazil',
-    'Mexico',
-    'Canada',
-    'Australia',
-    'Japan'
-  ];
 
   loginForm: FormGroup;
   isLogin: boolean=true;
@@ -46,8 +32,6 @@ export class AuthLayoutComponent {
       name: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(6)]],
-    role: ['', Validators.required],
-    country: [''],
     });
   }
   

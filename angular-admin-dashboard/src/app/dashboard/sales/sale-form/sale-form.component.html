@@ -3,25 +3,17 @@
 
   <form [formGroup]="saleForm" (ngSubmit)="onSubmit()">
     <div class="form-group">
-      <label for="productId">Product ID</label>
-      <input
-        id="productId"
-        type="number"
-        formControlName="productId"
-        placeholder="Enter product ID"
-      />
+      <label for="product_id">Product</label>
+      <select id="product_id" formControlName="product_id" placeholder="Select product">
+        <option *ngFor="let product of productList" [value]="product.id">{{ product.name }}</option>
+      </select>
     </div>
-
     <div class="form-group">
-      <label for="userId">User ID</label>
-      <input
-        id="userId"
-        type="number"
-        formControlName="userId"
-        placeholder="Enter user ID"
-      />
+      <label for="buyer_id">Buyer</label>
+      <select id="buyer_id" formControlName="buyer_id" placeholder="Select buyer">
+        <option *ngFor="let user of usersList" [value]="user.id">{{ user.name }}</option>
+      </select>
     </div>
-
     <div class="form-group">
       <label for="quantity">Quantity</label>
       <input

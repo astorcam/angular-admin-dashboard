@@ -8,6 +8,10 @@ import { Chart, ChartConfiguration } from 'chart.js';
 import { UserService } from '../../services/user.service';
 import { UserFormComponent } from "../user-form/user-form.component";
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
+
+
+const hiddenKeys = ['admin_id', 'id'];
 
 @Component({
   selector: 'app-user-list',
@@ -49,7 +53,7 @@ activeUsers!: number;
 
 showUserForm: boolean=false;
 
-constructor(private userService: UserService){}
+constructor(private userService: UserService, private authService: AuthService){}
 
 ngOnInit(){
   const date = new Date();
@@ -70,7 +74,8 @@ ngOnInit(){
       return year === yyyy && month === mm;
     }).length;
     //user table config
-    const keys = Object.keys(users[0]);
+    const keys = Object.keys(users[0]).filter(k => !hiddenKeys.includes(k));
+
     this.usersTableConfig.columns=keys;
     this.usersTableConfig.displayedColumns = keys.map(k => ({
       key: k,
@@ -106,12 +111,24 @@ ngOnInit(){
     
   }
   
-  onUserAdded(user: any) {
-  console.log('Producto agregado:', user);
-    this.showUserForm = false;  
+  onBuyerAdded(buyer: any) {
+     this.authService.getUser().subscribe(admin => {
+    if (!admin) return;
+
+    this.userService.addBuyer(buyer, admin.id).subscribe({
+      next: () => {
+        this.showUserForm = false;
+        this.userService.getUsers().subscribe(u => {
+          this.usersTableConfig.dataSource = u;
+        });
+      },
+      error: err => console.error('Error al agregar buyer:', err)
+    });
+  });
   }
-  onUserCancel() {
-    console.log("User canceled")
+
+  onBuyerCancel() {
+    console.log("Buyer canceled")
   this.showUserForm=false;
   }
   openForm() {

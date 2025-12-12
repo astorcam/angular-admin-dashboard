@@ -24,7 +24,7 @@
               </app-line-chart> 
             </div>
           </div>
-          <app-sale-form *ngIf="showSaleForm" (saleAdded)="onSaleAdded($event)" (saleCancel)="onSaleCanceled()"></app-sale-form>
+          <app-sale-form *ngIf="showSaleForm" (saleAdded)="onSaleAdded($event)" (saleCancel)="onSaleCanceled()" [usersList]="usersList" [productList]="productList"></app-sale-form>
           <app-data-table
                 [title]="'Last Sales'"
                 [type]="'sales'"
@@ -37,12 +37,11 @@
               <div class="col-6">
 
                 <div class="user-list">
-                  <h2>New Users</h2>
+                  <h2>New Clients</h2>
                   <li *ngFor="let user of users" class="list-group-item d-flex align-items-center">
                     <img [src]="user.avatar" alt="avatar" class="rounded-circle me-2" width="40" height="40">
                     <div>
                       <strong>{{ user.name }}</strong> — {{ user.country }} <br>
-                      <small>Role: {{ user.role }} | Status: {{ user.status }}</small>
                     </div>
                   </li>
                 </div>

@@ -85,21 +85,6 @@
                     autocomplete="new-password"
                     placeholder="Create a password"
                   />
-
-                  <label for="role">Role</label>
-                  <select id="role" formControlName="role">
-                    <option value="" disabled selected>Select a role</option>
-                    <option value="Admin">Admin</option>
-                    <option value="Manager">Manager</option>
-                    <option value="User">User</option>
-                  </select>
-
-                  <label for="country">Country</label>
-                  <select id="country" formControlName="country">
-                    <option value="" disabled selected>Select your country</option>
-                    <option *ngFor="let country of countries" [value]="country">{{ country }}</option>
-                  </select>
-                
         <button type="submit" class="login-button">Sign Up</button>
       </form>
       </div>

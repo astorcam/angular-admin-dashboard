@@ -26,13 +26,11 @@ constructor(private supabaseService: SupabaseService) {
         const avatarUrl='https://api.dicebear.com/9.x/dylan/png?seed=${'+user.email+'}';
         // 🔸 Insertar datos adicionales en tabla 'users'
         const { error: insertError } = await this.supabase
-          .from('users_info')
+          .from('admins')
           .insert([
             {
               id: user.id, // usa el mismo UUID que Supabase Auth
               name: extraData.name,
-              role: extraData.role || 'User',
-              country: extraData.country || null,
               avatar: avatarUrl || null,
               created_at: new Date(),
             },
@@ -76,7 +74,7 @@ constructor(private supabaseService: SupabaseService) {
         if (!user) return from([null]); // Si no hay usuario logueado
         return from(
           this.supabase
-            .from('users_info')
+            .from('admins')
             .select('*')
             .eq('id', user.id) // asumiendo que la columna 'id' coincide con user.id
             .single()

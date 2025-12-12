@@ -16,6 +16,11 @@ export class UserService {
     }
 
   getUsers(): Observable<any[]> {
-    return from(this.supabase.from('users_info').select('*').then(({ data }) => data ?? []));  
+    return from(this.supabase.from('buyers').select('*').then(({ data }) => data ?? []));  
   }
+
+  addBuyer(buyer: any, adminId: string) {
+  console.log('Buyer agregado:', buyer, adminId);
+  return from(this.supabase.from('buyers').insert([{ ...buyer, admin_id: adminId }]));
+}
 }

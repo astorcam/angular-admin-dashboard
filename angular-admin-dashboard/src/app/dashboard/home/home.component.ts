@@ -11,8 +11,9 @@ import { DataTableComponent } from "../layout/data-table/data-table.component";
 import { CommonModule } from '@angular/common';
 import { SaleFormComponent } from "../sales/sale-form/sale-form.component";
 import { forkJoin } from 'rxjs';
+import { AuthService } from '../../services/auth.service';
 
-
+const hiddenKeys = ['admin_id', 'buyer_id', 'product_id'];
 const months=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 @Component({
   selector: 'app-home',
@@ -59,25 +60,33 @@ salesTableConfig:any={
 users: any[] = [];
 products: any[] = [];
 showSaleForm: boolean=false;
+usersList: any[] = [];
+productList: any[] = [];
+
 
 
   constructor(private userService: UserService,
      private productService: ProductService,
-     private saleService: SaleService
+     private saleService: SaleService,
+     private authService: AuthService
   ){};
  
 ngOnInit(){
   this.userService.getUsers().subscribe(u => {
+    this.usersList=u
+    console.log(this.usersList)
     this.totalUsers = u.length
     this.users = u
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .slice(0, 5);
   });
 
-  this.productService.getProducts().subscribe(p => this.totalProducts = p.length);
+  this.productService.getProducts().subscribe(p => {
+    this.totalProducts = p.length
+  this.productList=p});
   this.saleService.getSales().subscribe(s =>{
   this.totalSales = s.length;
-  const keys = Object.keys(s[0]);
+  const keys = Object.keys(s[0]).filter(k => !hiddenKeys.includes(k));
   this.salesTableConfig.columns=keys;
   this.salesTableConfig.displayedColumns = keys.map(k => ({
   key: k,
@@ -139,15 +148,28 @@ this.saleService.getTopProductsOfYear().subscribe(top5 => {
 
 
 onSaleAdded(sale: any) {
-  console.log('Sale agregado:', sale);
   this.showSaleForm = false;
+  this.authService.getUser().subscribe(user => {
+    if (!user) return;
+
+    this.saleService.addSale(sale, user.id).subscribe({
+      next: () => {
+        this.showSaleForm = false;
+        this.saleService.getSales().subscribe(s => {
+          this.salesTableConfig.dataSource = s;
+        });
+      },
+      error: err => console.error('Error al agregar producto:', err)
+    });
+  });
 }
 onSaleCanceled() {
- console.log('Producto cancelado');
+ console.log('Sale cancelado');
   this.showSaleForm = false;
 }
 
 openForm() {
+
   if (this.showSaleForm == false) {
     this.showSaleForm = true;
   } 

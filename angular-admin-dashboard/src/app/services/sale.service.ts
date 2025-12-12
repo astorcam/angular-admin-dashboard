@@ -331,6 +331,10 @@ getProductSalesBarChartData(): Observable<{ labels: string[], data: number[] }> 
   );
 }
 
-
+  addSale(sale: any, userId: string) {
+  
+    console.log('Sale agregada:', sale, userId);
+  return from(this.supabase.from('sales').insert([{ ...sale, admin_id: userId }]));
+}
 }
 

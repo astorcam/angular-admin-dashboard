@@ -27,6 +27,22 @@
               height="40"
               style="border-radius: 50%" />
         </div>
+    <div *ngSwitchCase="'Actions'" class="actions-cell">
+      <button mat-icon-button [matMenuTriggerFor]="menu" (click)="$event.stopPropagation()">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item (click)="onEdit(element)">
+          <mat-icon>edit</mat-icon> Edit
+        </button>
+
+        <button mat-menu-item (click)="onDelete(element)">
+          <mat-icon>delete</mat-icon> Delete
+        </button>
+      </mat-menu>
+    </div>
+
         <span *ngSwitchDefault>{{ element[col] }}</span>
       </ng-container>
       </td>
