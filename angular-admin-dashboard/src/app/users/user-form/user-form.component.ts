@@ -21,7 +21,6 @@ export class UserFormComponent {
       email: ['', [Validators.required, Validators.email]],
       country: ['', Validators.required],
       avatar: ['https://api.dicebear.com/9.x/dylan/png?seed=default'],
-      purchases: [0, [Validators.min(0)]],
       created_at: [new Date().toISOString().split('T')[0]],
     });
   }

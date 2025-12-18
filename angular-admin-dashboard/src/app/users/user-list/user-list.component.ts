@@ -2,24 +2,24 @@ import { Component } from '@angular/core';
 import { StatsCardComponent } from "../../dashboard/layout/stats-card/stats-card.component";
 import { DataTableComponent } from "../../dashboard/layout/data-table/data-table.component";
 import { PieChartComponent } from "../../dashboard/layout/pie-chart/pie-chart.component";
-import { BarChartComponent } from "../../dashboard/layout/bar-chart/bar-chart.component";
-import { LineChartComponent } from "../../dashboard/layout/line-chart/line-chart.component";
-import { Chart, ChartConfiguration } from 'chart.js';
+import { Chart } from 'chart.js';
 import { UserService } from '../../services/user.service';
 import { UserFormComponent } from "../user-form/user-form.component";
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
+import { CustomerEditFormComponent } from "../customer-edit-form/customer-edit-form.component";
 
 
-const hiddenKeys = ['admin_id', 'id'];
+const hiddenKeys = ['admin_id'];
 
 @Component({
   selector: 'app-user-list',
-  imports: [StatsCardComponent, DataTableComponent, PieChartComponent, UserFormComponent, CommonModule],
+  imports: [StatsCardComponent, DataTableComponent, PieChartComponent, UserFormComponent, CommonModule, CustomerEditFormComponent],
   templateUrl: './user-list.component.html',
   styleUrl: './user-list.component.scss'
 })
 export class UserListComponent {
+
   usersTableConfig:any={
     columns:[],
     displayedColumns:[{}],
@@ -52,6 +52,14 @@ usersSuspended!: number;
 activeUsers!: number;
 
 showUserForm: boolean=false;
+showEditCustomerForm: boolean=false;
+
+editingCustomerFields={
+  id:0,
+  name:"",  
+  country:"",
+  email:""
+}
 
 constructor(private userService: UserService, private authService: AuthService){}
 
@@ -75,13 +83,16 @@ ngOnInit(){
     }).length;
     //user table config
     const keys = Object.keys(users[0]).filter(k => !hiddenKeys.includes(k));
-
-    this.usersTableConfig.columns=keys;
-    this.usersTableConfig.displayedColumns = keys.map(k => ({
+    this.usersTableConfig.columns=[...keys, 'Actions'];
+    this.usersTableConfig.displayedColumns = [
+      ...keys.map(k => ({
       key: k,
       label: k.charAt(0).toUpperCase() + k.slice(1)
-    }));
+    })),
+     { key: 'Actions', label: '' } 
+    ]
     this.usersTableConfig.dataSource=users;
+
     const userRoles: { [key: string]: number } = {}; 
     const userCountry: { [key: string]: number } = {}; 
     users.forEach(user => {
@@ -92,7 +103,7 @@ ngOnInit(){
       labels: Object.keys(userRoles),
       datasets: [
         {
-          label: "Total users",
+          label: "Total customers",
           data: Object.values(userRoles)
         }
       ]
@@ -102,7 +113,7 @@ ngOnInit(){
       labels: Object.keys(userCountry),
       datasets: [
           {
-            label: "Total users",
+            label: "Total customers",
             data: Object.values(userCountry)
           }
         ]
@@ -111,26 +122,68 @@ ngOnInit(){
     
   }
   
-  onBuyerAdded(buyer: any) {
+  onCustomerAdded(customer: any) {
      this.authService.getUser().subscribe(admin => {
     if (!admin) return;
 
-    this.userService.addBuyer(buyer, admin.id).subscribe({
+    this.userService.addCustomer(customer, admin.id).subscribe({
       next: () => {
         this.showUserForm = false;
         this.userService.getUsers().subscribe(u => {
           this.usersTableConfig.dataSource = u;
         });
       },
-      error: err => console.error('Error al agregar buyer:', err)
+      error: err => console.error('Error al agregar Customer:', err)
     });
   });
   }
 
-  onBuyerCancel() {
-    console.log("Buyer canceled")
+  onCustomerCanceled() {
+    console.log("Customer canceled")
   this.showUserForm=false;
   }
+
+
+onCustomerDeleted(customerRow: any) {
+this.authService.getUser().subscribe(user => {
+    if (!user) return;
+    
+    this.userService.deleteCustomer(customerRow, user.id).subscribe({
+      next: () => {
+        this.userService.getUsers().subscribe(c => {
+          this.usersTableConfig.dataSource = c;
+        });
+      },
+      error: err => console.error('Error al borrar Customer:', err)
+    });
+  });
+}
+
+onEditCustomer(customerRow: any) {
+this.showEditCustomerForm=true
+this.editingCustomerFields={
+  id:customerRow.id,
+  name:customerRow.name,
+  country:customerRow.country,
+  email:customerRow.email
+}
+console.log(this.editingCustomerFields)
+}
+
+onCustomertEdited(editedCustomer: any) {
+this.authService.getUser().subscribe(user => {
+    if (!user) return;
+    this.userService.editCustomer(editedCustomer, user.id).subscribe({
+      next: () => {
+        this.showEditCustomerForm=false
+        this.userService.getUsers().subscribe(c => {
+          this.usersTableConfig.dataSource = c;
+        });
+      },
+      error: err => console.error('Error al editar producto:', err)
+    });
+  });}
+
   openForm() {
     this.showUserForm=true;
   }

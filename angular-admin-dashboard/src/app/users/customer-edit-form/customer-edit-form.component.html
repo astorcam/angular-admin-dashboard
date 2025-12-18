@@ -1,0 +1,44 @@
+<div class="product-form-container">
+  <h2>Edit Customer</h2>
+
+  <form [formGroup]="customerForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="name">Customer Name</label>
+      <input
+        id="name"
+        type="text"
+        formControlName="name"
+        [placeholder]="name"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="country">Country</label>
+      <input
+      bot
+      
+        id="country"
+        type="text"
+        formControlName="country"
+        [placeholder]="country"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input
+        id="email"
+        type="text"
+        formControlName="email"
+       [placeholder]="email"
+      />
+    </div>
+
+    <button class="submit-button" type="submit" [disabled]="customerForm.invalid">
+      Save Changes
+    </button>
+    <button type="button" class="cancel-button" (click)="onCancel()">
+      Cancel
+    </button>
+  </form>
+</div>

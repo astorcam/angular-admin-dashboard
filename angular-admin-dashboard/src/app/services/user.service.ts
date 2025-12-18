@@ -9,6 +9,7 @@ import { SupabaseService } from './supabase.service';
 })
 export class UserService {
 
+
   private apiUrl = 'http://localhost:3000/users';
   supabase: SupabaseClient;
    
@@ -20,10 +21,36 @@ export class UserService {
     return from(this.supabase.from('buyers').select('*').then(({ data }) => data ?? []));  
   }
 
-  addBuyer(buyer: any, adminId: string) {
+  addCustomer(buyer: any, adminId: string) {
   console.log('Buyer agregado:', buyer, adminId);
   return from(this.supabase.from('buyers').insert([{ ...buyer, admin_id: adminId }]));
 }
+
+deleteCustomer(customer: any, userId: string) {
+  console.log('Customer borrado:', customer, userId);
+  return from(
+    this.supabase
+    .from('buyers')
+    .delete()
+    .match({ id: customer.id, admin_id: userId })
+  );
+}
+
+  editCustomer(editedCustomer: any, admin_id: string) {
+    console.log('Customer editado:', editedCustomer, admin_id);
+    return from(
+    this.supabase
+      .from('buyers')
+      .update({
+        name: editedCustomer.name,
+        country: editedCustomer.country,
+        email: editedCustomer.email,
+      })
+      .eq('id', editedCustomer.id)         // ← identificar por ID
+      .eq('admin_id', admin_id)          // ← asegurar que sea del admin
+  ); 
+  }
+
 
   getUserById(id: number): Observable<any> {
       return from(
