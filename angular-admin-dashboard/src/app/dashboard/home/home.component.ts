@@ -12,16 +12,19 @@ import { CommonModule } from '@angular/common';
 import { SaleFormComponent } from "../sales/sale-form/sale-form.component";
 import { forkJoin } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
+import { SaleEditFormComponent } from '../sales/sale-edit-form/sale-edit-form.component';
 
 const hiddenKeys = ['admin_id', 'buyer_id', 'product_id'];
 const months=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 @Component({
   selector: 'app-home',
-  imports: [CommonModule, RouterModule, StatsCardComponent, BarChartComponent, MatSidenavModule, LineChartComponent, DataTableComponent, SaleFormComponent],
+  imports: [CommonModule, RouterModule, StatsCardComponent, BarChartComponent, MatSidenavModule, LineChartComponent, DataTableComponent, SaleFormComponent, SaleEditFormComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
 export class HomeComponent {
+
+
   totalUsers=0;
   totalProducts=0;
   totalSales=0;
@@ -62,6 +65,16 @@ products: any[] = [];
 showSaleForm: boolean=false;
 usersList: any[] = [];
 productList: any[] = [];
+showEditSaleForm: boolean=false;
+editingSaleFields={ 
+    id: 0, 
+    quantity: 0, 
+    total: 0, 
+    date: "2025-01-01",
+    status: "Completed",
+    productName:"",
+    buyerName:"" 
+  }
 
 
 
@@ -83,15 +96,20 @@ ngOnInit(){
 
   this.productService.getProducts().subscribe(p => {
     this.totalProducts = p.length
-  this.productList=p});
-  this.saleService.getSales().subscribe(s =>{
+    this.productList=p
+});
+  this.saleService.getSalesWithNames().subscribe(s =>{
   this.totalSales = s.length;
   const keys = Object.keys(s[0]).filter(k => !hiddenKeys.includes(k));
-  this.salesTableConfig.columns=keys;
-  this.salesTableConfig.displayedColumns = keys.map(k => ({
-  key: k,
-  label: k.charAt(0).toUpperCase() + k.slice(1)
-}));
+  this.salesTableConfig.columns=[...keys, 'Actions'];
+  this.salesTableConfig.displayedColumns = [
+      ...keys.map(k => ({
+        key: k,
+        label: k.charAt(0).toUpperCase() + k.slice(1)
+      })),
+      { key: 'Actions', label: '' } 
+    ];
+
   this.salesTableConfig.dataSource=s.reverse();
     } 
   )
@@ -147,6 +165,34 @@ this.saleService.getTopProductsOfYear().subscribe(top5 => {
 }
 
 
+onEditSale(saleRow: any) {
+this.showEditSaleForm=true
+this.editingSaleFields={
+  id:saleRow.id,
+  quantity:saleRow.quantity,
+  total:saleRow.total,
+  date:saleRow.date,
+  status:saleRow.status,
+  productName:saleRow.product,
+  buyerName:saleRow.client
+}
+console.log(this.editingSaleFields)
+}
+
+onSaleDeleted(saleRow: any) {
+this.authService.getUser().subscribe(user => {
+    if (!user) return;
+    
+    this.saleService.deleteSale(saleRow, user.id).subscribe({
+      next: () => {
+        this.saleService.getSales().subscribe(s => {
+          this.salesTableConfig.dataSource = s;
+        });
+      },
+      error: err => console.error('Error al borrar producto:', err)
+    });
+  });
+}
 onSaleAdded(sale: any) {
   this.showSaleForm = false;
   this.authService.getUser().subscribe(user => {
@@ -166,6 +212,20 @@ onSaleAdded(sale: any) {
 onSaleCanceled() {
  console.log('Sale cancelado');
   this.showSaleForm = false;
+}
+onSaleEdited(editedSale: Event) {
+this.authService.getUser().subscribe(user => {
+    if (!user) return;
+    this.saleService.editSale(editedSale, user.id).subscribe({
+      next: () => {
+        this.showEditSaleForm=false
+        this.saleService.getSalesWithNames().subscribe(s => {
+          this.salesTableConfig.dataSource = s;
+        });
+      },
+      error: err => console.error('Error al editar sale:', err)
+    });
+  });
 }
 
 openForm() {

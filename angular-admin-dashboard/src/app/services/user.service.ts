@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { from, Observable } from 'rxjs';
+import { from, map, Observable } from 'rxjs';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { SupabaseService } from './supabase.service';
 
@@ -8,6 +8,7 @@ import { SupabaseService } from './supabase.service';
   providedIn: 'root'
 })
 export class UserService {
+
   private apiUrl = 'http://localhost:3000/users';
   supabase: SupabaseClient;
    
@@ -23,4 +24,22 @@ export class UserService {
   console.log('Buyer agregado:', buyer, adminId);
   return from(this.supabase.from('buyers').insert([{ ...buyer, admin_id: adminId }]));
 }
+
+  getUserById(id: number): Observable<any> {
+      return from(
+        this.supabaseService.client
+        .from('buyers')
+        .select('*')
+          .eq('id', id)
+          .single()
+        ).pipe(
+        map(result => {
+          if (result.error) {
+            console.error('Error fetching product:', result.error);
+            return null;
+          }
+          return result.data;
+        })
+      );
+    }
 }

@@ -25,7 +25,19 @@
             </div>
           </div>
           <app-sale-form *ngIf="showSaleForm" (saleAdded)="onSaleAdded($event)" (saleCancel)="onSaleCanceled()" [usersList]="usersList" [productList]="productList"></app-sale-form>
-          <app-data-table
+          <app-edit-sale-form *ngIf="showEditSaleForm" (saleEdited)="onSaleEdited($event)" (saleCanceled)="onSaleCanceled()"  
+          [usersList]="usersList" 
+          [productList]="productList" 
+          [id]="editingSaleFields.id"
+          [productName]="editingSaleFields.productName" 
+          [buyerName]="editingSaleFields.buyerName" 
+          [quantity]="editingSaleFields.quantity" 
+          [total]="editingSaleFields.total" 
+          [date]="editingSaleFields.date" 
+          [status]="editingSaleFields.status">
+        </app-edit-sale-form>
+
+          <app-data-table (deleteClicked)="onSaleDeleted($event)" (editClicked)="onEditSale($event)"
                 [title]="'Last Sales'"
                 [type]="'sales'"
                 (addClicked)="openForm()" 

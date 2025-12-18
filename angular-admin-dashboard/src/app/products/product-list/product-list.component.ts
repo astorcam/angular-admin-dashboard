@@ -9,7 +9,7 @@ import { Chart, ChartConfiguration } from 'chart.js';
 import { PieChartComponent } from "../../dashboard/layout/pie-chart/pie-chart.component";
 import { LineChartComponent } from "../../dashboard/layout/line-chart/line-chart.component";
 import { ProductFormComponent } from "../product-form/product-form.component";
-import { ProductEditFormComponent } from '../product-edit-form copy/product-edit-form.component';
+import { ProductEditFormComponent } from '../product-edit-form/product-edit-form.component';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 
@@ -238,7 +238,8 @@ this.authService.getUser().subscribe(user => {
       },
       error: err => console.error('Error al editar producto:', err)
     });
-  });}
+  });
+}
 onEditProduct(productRow: any){
 this.showEditProductForm=true
 this.editingProductFields={
@@ -249,8 +250,8 @@ this.editingProductFields={
   stock:productRow.stock,
 }
 console.log(this.editingProductFields)
-
 }
+
 openForm() {
   if (this.showProductForm == false) {
     this.showProductForm = true;

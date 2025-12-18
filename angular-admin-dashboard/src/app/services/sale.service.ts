@@ -9,6 +9,8 @@ import { ProductService } from './product.service';
   providedIn: 'root'
 })
 export class SaleService {
+
+  
   private apiUrl = 'http://localhost:3000/sales';
   supabase: SupabaseClient;
  
@@ -19,7 +21,28 @@ export class SaleService {
   getSales(){
         return from(this.supabase.from('sales').select('*').then(({ data }) => data ?? []));  
     }
-    
+getSalesWithNames() {
+  return from(
+    this.supabase
+      .from('sales')
+      .select(`
+        *,
+        products (name),
+        buyers (name)
+      `)
+       .then(({ data }) =>
+        (data ?? []).map(sale => {
+          const { products, buyers, ...cleanSale } = sale;
+
+          return {
+            ...cleanSale,
+            product: sale.products.name ?? '',
+            client: sale.buyers.name ?? ''
+          };
+        })
+      )
+  );
+}
  getProfit(): Observable<number> {
   return from(this.supabase.from('sales').select('total')).pipe(
     map(({ data, error }) => {
@@ -335,6 +358,32 @@ getProductSalesBarChartData(): Observable<{ labels: string[], data: number[] }> 
   
     console.log('Sale agregada:', sale, userId);
   return from(this.supabase.from('sales').insert([{ ...sale, admin_id: userId }]));
+}
+
+deleteSale(saleRow: any, userId: string) {
+    console.log('Sale borrado:', saleRow, userId);
+    return from(
+      this.supabase
+      .from('sales')
+      .delete()
+      .match({ id: saleRow.id, admin_id: userId })
+    );
+  }
+
+    editSale(editedSale: any, admin_id: string) {
+    console.log('Sale editado:', editedSale, admin_id);
+    return from(
+    this.supabase
+      .from('sales')
+      .update({
+        quantity: editedSale.quantity, 
+        total: editedSale.total, 
+        date: editedSale.date,
+        status: editedSale.status
+      })
+      .eq('id', editedSale.id)         // ← identificar por ID
+      .eq('admin_id', admin_id)          // ← asegurar que sea del admin
+  ); 
 }
 }
 
