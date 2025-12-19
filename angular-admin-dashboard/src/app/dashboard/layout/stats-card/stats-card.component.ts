@@ -17,6 +17,6 @@ export class StatsCardComponent {
 @Input({required:true}) statsIcon!: string;
 @Input({required:true}) statsText!: string;
 @Input({required:true}) statsValue!: number;
-@Input() statsFormat: '€' | '%' | '' = '';
+@Input() statsFormat:string = '';
 
 }

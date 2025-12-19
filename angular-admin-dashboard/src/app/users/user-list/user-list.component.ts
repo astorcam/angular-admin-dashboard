@@ -48,8 +48,8 @@ usersCountryBarChart: any;
 newUsersLineChart!: Chart;
 totalUsers!: number;
 newUsers!: number;
-usersSuspended!: number;
-activeUsers!: number;
+inactiveCustomers!: number;
+activeCustomers!: number;
 
 showUserForm: boolean=false;
 showEditCustomerForm: boolean=false;
@@ -72,8 +72,6 @@ ngOnInit(){
   const today = `${yyyy}/${mm}/${dd}`;
   this.userService.getUsers().subscribe(users=>{
     this.totalUsers=users.length;
-    this.usersSuspended = users.filter(u => u.status === "Suspended").length;
-    this.activeUsers = users.filter(u => u.lastLogin===today).length;
     this.newUsers = users.filter(u => {
       const date = new Date(u.created_at);
       const year = date.getFullYear();
@@ -99,6 +97,18 @@ ngOnInit(){
       userRoles[user.role] = (userRoles[user.role] || 0) + 1;
       userCountry[user.country] = (userCountry[user.country] || 0) + 1;
     });
+
+  //active customers last 30 days
+  this.userService.getActiveCustomers().subscribe(customers=>{
+    console.log(customers)
+    this.activeCustomers = customers})
+
+  //inactive customers last 90 days
+  this.userService.getInactiveCustomers().subscribe(customers=>{
+    console.log(customers)
+    this.inactiveCustomers = customers})
+
+  //pie chart
     this.usersRolesPieConfig = {
       labels: Object.keys(userRoles),
       datasets: [
@@ -109,6 +119,7 @@ ngOnInit(){
       ]
     };
     
+    //pie chart countries
     this.usersCountryPieConfig = {
       labels: Object.keys(userCountry),
       datasets: [

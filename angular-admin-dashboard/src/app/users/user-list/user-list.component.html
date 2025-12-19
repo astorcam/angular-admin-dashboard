@@ -3,10 +3,10 @@
 <div class="dashboard-content">
     <h1>Customers</h1>
         <div class="fast-stats">
-           <app-stats-card statsTitle="Total Clients" statsIcon="group" statsText="" [statsValue]="totalUsers"></app-stats-card>
-           <app-stats-card statsTitle="New This Month" statsIcon="trending_up" statsText="" [statsValue]="newUsers"></app-stats-card>
-           <app-stats-card statsTitle="Suspended" statsIcon="pan_tool" statsText="" [statsValue]="usersSuspended"></app-stats-card>
-           <app-stats-card statsTitle="Active Today" statsIcon="history" statsText="" [statsValue]="activeUsers"></app-stats-card>
+           <app-stats-card statsTitle="Total Customers" statsIcon="group" statsText="" [statsValue]="totalUsers"></app-stats-card>
+           <app-stats-card statsTitle="New Customers" statsIcon="trending_up" statsText="Last 30 days" [statsValue]="newUsers"></app-stats-card>
+           <app-stats-card statsTitle="Active Customers" statsIcon="history" statsText="Last 30 days" [statsValue]="activeCustomers"></app-stats-card>
+           <app-stats-card statsTitle="Inactive Customers" statsIcon="pan_tool" statsText="Last 90 days" [statsValue]="inactiveCustomers"></app-stats-card>
         </div> 
     <app-user-form *ngIf="showUserForm" (userAdded)="onCustomerAdded($event)" (userCanceled)="onCustomerCanceled()"></app-user-form>
     <app-customer-edit-form *ngIf="showEditCustomerForm" (customerEdited)="onCustomertEdited($event)" (customerCanceled)="onCustomerCanceled()" 
@@ -38,7 +38,7 @@
                 <app-pie-chart 
                 [labels]="usersCountryPieConfig.labels"
                 [data]="usersCountryPieConfig.datasets[0].data"
-                title="Users' countries" 
+                title="Customers' countries" 
                 [label]="usersCountryPieConfig.datasets[0].label">
             </app-pie-chart>
         </div>
